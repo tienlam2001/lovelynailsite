@@ -1,5 +1,15 @@
 # vinext-starter
 
+## Shared gallery
+
+Lovely's gallery reads the public `galleryImages` collection in Firebase project
+`casabellanailsspawebsite`, database `(default)`. No service-account key is used.
+Manage uploads through the existing gallery administrator and set `salonname`
+to `Lovely Nail & Spa`. Each record needs an HTTPS `imageUrl` and may include
+`alt` for its accessible description. Casabella-labeled photos are excluded.
+When no Lovely records exist or Firebase cannot be reached, the nine existing
+Lovely photos remain visible. New records appear on the next page load.
+
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.

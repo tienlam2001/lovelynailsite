@@ -1,5 +1,6 @@
 import { AnnouncementPopup } from "./AnnouncementPopup";
 import { ScrollReveal } from "./ScrollReveal";
+import { Gallery } from "./Gallery";
 
 const bookingUrl = "https://abcapp.us?appid=vqD7eIC";
 const siteUrl = "https://nailslovely.com";
@@ -626,14 +627,7 @@ export default function Home() {
           <h2>Quiet color, glossy finishes, precise grooming.</h2>
           <a href={bookingUrl}>Book from gallery inspiration</a>
         </div>
-        <div className="gallery-grid">
-          {galleryItems.map((item, index) => (
-            <div className={`gallery-tile tile-${index + 1}`} key={item.title} data-reveal="zoom-soft">
-              <img src={item.image} alt={item.title} loading="lazy" />
-              <span>{item.title}</span>
-            </div>
-          ))}
-        </div>
+        <Gallery fallback={galleryItems} />
       </section>
 
       <section id="reviews" className="section-pad reviews-section">
@@ -799,9 +793,13 @@ export default function Home() {
         <a href={bookingUrl}>Book Now</a>
       </footer>
 
-      <a className="floating-booking" href={bookingUrl} aria-label="Book an appointment">
-        Book
-      </a>
+      <div className="mobile-action-bar" aria-label="Quick appointment actions">
+        <a href={bookingUrl}>Book</a>
+        <a href={`tel:${phone}`}>Call</a>
+        <a href={directionsUrl} target="_blank" rel="noreferrer">
+          Directions
+        </a>
+      </div>
     </main>
   );
 }
