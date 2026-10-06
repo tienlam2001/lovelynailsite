@@ -1,0 +1,24 @@
+function hasValidLovelyPromotionSignupFields() {
+  let data = request.resource.data;
+  return data.keys().hasAll(['name', 'phone', 'email', 'emailConsent', 'smsConsent', 'consentText', 'smsConsentText', 'consentVersion', 'salonname', 'source', 'createdAt'])
+    && data.keys().hasOnly(['name', 'phone', 'email', 'emailConsent', 'smsConsent', 'consentText', 'smsConsentText', 'consentVersion', 'salonname', 'source', 'createdAt'])
+    && data.name is string && data.name.size() > 0 && data.name.size() <= 120
+    && data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 32
+    && data.phone.matches('^\\+?[0-9\\s().-]{7,32}$')
+    && data.email is string && data.email.size() > 3 && data.email.size() <= 160
+    && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+    && data.emailConsent == true && data.smsConsent is bool
+    && data.consentText == 'I agree to receive promotional emails from Lovely Nail & Spa. I can withdraw my consent by contacting the salon.'
+    && data.smsConsentText == (data.smsConsent ? 'I also agree to receive promotional text messages from Lovely Nail & Spa. Consent is not a condition of purchase. Message and data rates may apply. Reply STOP to opt out.' : '')
+    && data.consentVersion == '2026-10-06'
+    && data.salonname == 'Lovely Nail & Spa'
+    && data.source == 'nailslovely.com'
+    && data.createdAt is timestamp;
+}
+
+match /lovelyNailPromotionList/{signupId} {
+  allow create: if hasValidLovelyPromotionSignupFields() && request.resource.data.createdAt == request.time;
+  allow read, delete: if isAdmin();
+  allow update: if isAdmin() && hasValidLovelyPromotionSignupFields()
+    && request.resource.data.createdAt == resource.data.createdAt;
+}

@@ -1,7 +1,11 @@
-import { AnnouncementPopup } from "./AnnouncementPopup";
+import { AnnouncementPopup, PromotionalSlides } from "./AnnouncementPopup";
+import { getFirebaseOffer } from "./firebase-offer";
+import { PromotionSignup } from "./PromotionSignup";
+import { CustomerChat } from "./CustomerChat";
 import { ScrollReveal } from "./ScrollReveal";
 import { Gallery } from "./Gallery";
 import { getFirebaseMenu } from "./firebase-menu";
+import { MobileExperience } from "./MobileExperience";
 
 export const dynamic = "force-dynamic";
 
@@ -430,7 +434,10 @@ const faqSchema: Record<string, unknown> = {
 };
 
 export default async function Home() {
-  const liveMenu = await getFirebaseMenu(menuSections);
+  const [liveMenu, welcomeOffer] = await Promise.all([
+    getFirebaseMenu(menuSections),
+    getFirebaseOffer(),
+  ]);
   const liveBusinessSchema = {
     ...localBusinessSchema,
     makesOffer: liveMenu.map((section) => ({
@@ -453,8 +460,11 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <AnnouncementPopup bookingUrl={bookingUrl} />
+      <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
+      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offer={welcomeOffer} />
+      <CustomerChat />
       <ScrollReveal />
+      <div className="desktop-experience">
       <header className="nav-wrap" aria-label="Primary navigation">
         <a className="brand" href="#home" aria-label="Lovely Nail and Spa home">
           <img className="brand-logo" src="/ln-mark.jpg" alt="" />
@@ -702,23 +712,10 @@ export default async function Home() {
       </section>
 
       <section id="promotions" className="section-pad promo-section">
-        <div className="promo-card" data-reveal="fade-up">
-          <p className="eyebrow">Promotions</p>
-          <h2>Seasonal offers can live here.</h2>
-          <p>
-            Add limited-time specials, weekday offers, loyalty notes, or new
-            client promotions without distracting from appointment booking.
-          </p>
-          <a className="button" href={bookingUrl}>
-            Book Promotion
-          </a>
-        </div>
-        <div className="promo-list" aria-label="Promotion placeholders" data-reveal="float-in">
-          <span>New client refresh</span>
-          <span>Gel manicure feature</span>
-          <span>Pedicure weekday calm</span>
-        </div>
+        <PromotionalSlides bookingUrl={bookingUrl} offer={welcomeOffer} />
       </section>
+
+      <PromotionSignup />
 
       <section className="section-pad appointment-panel" aria-label="Book an appointment online" data-reveal="fade-up">
         <div>
@@ -807,6 +804,7 @@ export default async function Home() {
         <a href={directionsUrl} target="_blank" rel="noreferrer">
           Directions
         </a>
+      </div>
       </div>
     </main>
   );

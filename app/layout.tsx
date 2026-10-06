@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./mobile.css";
 
 const siteUrl = "https://nailslovely.com";
+export const viewport: Viewport = { width: undefined, initialScale: undefined };
 const siteDescription =
   "Lovely Nail & Spa is a Winter Garden, FL nail salon offering pedicures, acrylic nails, Gel-X, dipping powder, manicures, polish changes, waxing, nail design, and online booking near Daniels Rd.";
 
@@ -84,6 +86,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /></head>
       <body>{children}</body>
     </html>
   );
