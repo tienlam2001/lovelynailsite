@@ -1,5 +1,15 @@
 # vinext-starter
 
+## Service price management
+
+The homepage reads its complete menu from `lovelyNailServices` in the shared Firebase
+project. In Casabella's Admin Services editor, select `Lovely Nail & Spa`.
+Saved names, descriptions, prices, categories, additions, and removals appear on
+the next Lovely homepage load. `sectionOrder` and `itemOrder` control display
+order; `active: false` hides a service. Public visitors can read
+the menu; only users with the existing Firebase `admin` claim can edit it.
+Current menu values remain the fallback if Firebase is unavailable.
+
 ## Shared gallery
 
 Lovely's gallery reads the public `galleryImages` collection in Firebase project

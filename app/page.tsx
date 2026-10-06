@@ -1,6 +1,9 @@
 import { AnnouncementPopup } from "./AnnouncementPopup";
 import { ScrollReveal } from "./ScrollReveal";
 import { Gallery } from "./Gallery";
+import { getFirebaseMenu } from "./firebase-menu";
+
+export const dynamic = "force-dynamic";
 
 const bookingUrl = "https://abcapp.us?appid=vqD7eIC";
 const siteUrl = "https://nailslovely.com";
@@ -388,17 +391,6 @@ const localBusinessSchema: Record<string, unknown> = {
     reviewCount: "453",
   },
   hasMap: directionsUrl,
-  makesOffer: menuSections.map((section) => ({
-    "@type": "Offer",
-    itemOffered: {
-      "@type": "Service",
-      name: section.title,
-      provider: {
-        "@id": `${siteUrl}/#nailsalon`,
-      },
-      areaServed: "Winter Garden, FL",
-    },
-  })),
   potentialAction: {
     "@type": "ReserveAction",
     target: bookingUrl,
@@ -437,12 +429,25 @@ const faqSchema: Record<string, unknown> = {
   ],
 };
 
-export default function Home() {
+export default async function Home() {
+  const liveMenu = await getFirebaseMenu(menuSections);
+  const liveBusinessSchema = {
+    ...localBusinessSchema,
+    makesOffer: liveMenu.map((section) => ({
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: section.title,
+        provider: { "@id": `${siteUrl}/#nailsalon` },
+        areaServed: "Winter Garden, FL",
+      },
+    })),
+  };
   return (
     <main id="home" className="site-shell">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(liveBusinessSchema).replace(/</g, "\\u003c") }}
       />
       <script
         type="application/ld+json"
@@ -565,7 +570,10 @@ export default function Home() {
         </div>
 
         <div className="menu-grid">
-          {menuSections.map((section) => (
+          {liveMenu.length === 0 && (
+            <p>Our menu is being updated. <a href={`tel:${phone}`}>Call us for services and pricing.</a></p>
+          )}
+          {liveMenu.map((section) => (
             <article
               className={`menu-card${section.featured ? " menu-card-featured" : ""}${
                 section.title === "Pedicures" ? " menu-card-wide" : ""
