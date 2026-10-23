@@ -434,10 +434,11 @@ const faqSchema: Record<string, unknown> = {
 };
 
 export default async function Home() {
-  const [liveMenu, welcomeOffer] = await Promise.all([
+  const [liveMenu, offerFeed] = await Promise.all([
     getFirebaseMenu(menuSections),
     getFirebaseOffer(),
   ]);
+  const welcomeOffer = offerFeed.offer;
   const liveBusinessSchema = {
     ...localBusinessSchema,
     makesOffer: liveMenu.map((section) => ({
@@ -461,7 +462,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
-      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offer={welcomeOffer} />
+      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offerFeed={offerFeed} />
       <CustomerChat />
       <ScrollReveal />
       <div className="desktop-experience">
@@ -712,7 +713,7 @@ export default async function Home() {
       </section>
 
       <section id="promotions" className="section-pad promo-section">
-        <PromotionalSlides bookingUrl={bookingUrl} offer={welcomeOffer} />
+        <PromotionalSlides bookingUrl={bookingUrl} offer={welcomeOffer} status={offerFeed.status} />
       </section>
 
       <PromotionSignup />

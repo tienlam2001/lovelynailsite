@@ -25,6 +25,9 @@ export function CustomerChat() {
             title="Message the Lovely Nail & Spa team"
             referrerPolicy="strict-origin-when-cross-origin"
           />
+          <p className="customer-chat-fallback">
+            Messages are saved for the Lovely team in Operatix. If chat does not load, call <a href="tel:+14076540254">(407) 654-0254</a>.
+          </p>
         </section>
       )}
       <button

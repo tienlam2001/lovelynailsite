@@ -14,28 +14,60 @@ also supported through 1366px. Gallery filters derive from real image categories
 or titles, using Lovely's Firestore photos with the owner's nine photos as fallback.
 Tapping a photo opens a keyboard-accessible, uncropped full-image dialog.
 
+## Shared Operatix data
+
+Lovely Nail & Spa reads the same Firebase project Operatix already writes:
+`casabellanailsspawebsite`, database `(default)`. The public project id is the
+only client config. No service-account key, admin token, or Base44 service
+credential is used. Optional overrides are `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+and `NEXT_PUBLIC_FIREBASE_DATABASE_ID` (see `.env.example`).
+
+Operatix covers Lovely Nails, Casabella Nails And Spa, and Ecco Nails. This
+site keeps a record only when it belongs to Lovely:
+
+- Offers use the Operatix location slug `lovely` (the Offers screen saves
+  `location: "lovely"` on the `offers` collection). `offers/welcome` is
+  Casabella and is ignored.
+- Gallery, services, and promotions use `salonname` / `business`. The same
+  key Operatix uses — dropping “nail(s)”, “spa”, and “and” — matches
+  `Lovely Nail & Spa` and `Lovely Nails`, and rejects Casabella and Ecco.
+- A record with no location or salon name is Lovely only when its document id
+  is `lovely`.
+
+Active means not `enabled: false`, `active: false`, `isActive: false`,
+`hidden: true`, or a status of draft, archived, inactive, disabled, paused,
+expired, or hidden. `startDate` and `endDate` (`YYYY-MM-DD`) are inclusive
+calendar days in America/New_York. Missing dates mean the record is not
+date-limited.
+
 ## Service price management
 
-The homepage reads its complete menu from `lovelyNailServices` in the shared Firebase
-project. In Casabella's Admin Services editor, select `Lovely Nail & Spa`.
-Saved names, descriptions, prices, categories, additions, and removals appear on
-the next Lovely homepage load. `sectionOrder` and `itemOrder` control display
-order; `active: false` hides a service. Public visitors can read
-the menu; only users with the existing Firebase `admin` claim can edit it.
-Current menu values remain the fallback if Firebase is unavailable.
+The homepage reads `lovelyNailServices`, plus any Lovely rows in `services`.
+In Operatix Firestore Content, or Casabella's Admin Services editor, select
+`Lovely Nail & Spa`. Saved names, descriptions, prices, categories, additions,
+and removals appear on the next Lovely homepage load. `sectionOrder` and
+`itemOrder` control display order; `active: false` hides a service. Public
+visitors can read the menu; only users with the existing Firebase `admin`
+claim can edit it. The built-in menu remains visible if both collections are
+unreachable. An empty published menu shows a short “being updated” note.
 
 ## Welcome offer and promotional slides
 
-The welcome popup and homepage promotion read `offers/lovely` from the shared
-Firestore project on each page load. Edit `kicker`, `title`, `badge`, `message`,
-`imageUrl`, `ctaLabel`, and `ctaPath` in the other site's offer editor.
-An empty `slides` array uses the top-level offer; otherwise each slide can override
-those fields. `slideDurationMs` controls rotation (default 6500 ms), with manual
-controls and reduced-motion support. `enabled: false` hides the offer.
-The popup displays the first slide. Closing it leaves a side tab, unless the
-visitor chooses “Don't show this again.” `/promotions` links to the homepage
-promotion section; `/booking` uses the appointment link. Missing or unavailable
-offers never display a fabricated discount.
+Each page load lists the shared `offers` collection and the `promotions`
+collection. Active Lovely offers are shown first, newest `updateTime` first.
+Operatix Offers → Lovely Nail & Spa writes that offer, including AI slide
+images on `slides[].imageUrl`. Each offer uses its own `kicker`, `title`,
+`badge`, `message`, `imageUrl`, `ctaLabel`, and `ctaPath`. Slide images inherit
+the offer’s call to action. An empty `slides` array uses the offer itself.
+Active Lovely rows in `promotions` (`title`, `description`, `offer`, `imageUrl`,
+`isActive`, `startDate`, `endDate`, `salonname`) are extra slides after the
+welcome offer. `slideDurationMs` controls rotation (default 6500 ms), with
+manual controls and reduced-motion support. The popup shows the first slide.
+Closing it leaves a side tab, unless the visitor chooses “Don't show this again.”
+`/promotions` links to the homepage promotion section; `/booking` uses the
+appointment link. When nothing active is published, the promotion card says so.
+When Firestore cannot be reached, it says offers are unavailable. Neither state
+invents a discount.
 
 Offer posters support 900 × 1400 px portrait artwork. The homepage preview uses
 a roomy 16:10 landscape card, with the entire image centered inside without
@@ -71,13 +103,45 @@ Publish the Operatix chat function/pages before publishing this website widget.
 
 ## Shared gallery
 
-Lovely's gallery reads the public `galleryImages` collection in Firebase project
-`casabellanailsspawebsite`, database `(default)`. No service-account key is used.
-Manage uploads through the existing gallery administrator and set `salonname`
-to `Lovely Nail & Spa`. Each record needs an HTTPS `imageUrl` and may include
-`alt` for its accessible description. Casabella-labeled photos are excluded.
-When no Lovely records exist or Firebase cannot be reached, the nine existing
-Lovely photos remain visible. New records appear on the next page load.
+The gallery reads two public collections in `casabellanailsspawebsite` /
+`(default)`: Operatix Gallery Manager’s `gallery` collection, then the existing
+`galleryImages` collection. No service-account key is used. Set `salonname` to
+`Lovely Nail & Spa`. Each record needs an HTTPS `imageUrl`. `alt` or `title`
+is the accessible description; `category` or the first `tags` entry groups
+mobile filters. `featured` and `sortOrder` control order. `active: false` or
+`hidden: true` omits a photo. Casabella-labeled photos are excluded. `gallery`
+is not publicly readable until the rule in
+`firestore/lovely-shared-content.rules` is merged, so Operatix uploads stay
+hidden until that rule is published. When no Lovely records exist or Firebase
+cannot be reached, the nine existing Lovely photos remain visible. New records
+appear on the next page load.
+
+## What the owner sets in Operatix
+
+1. Offers: open Operatix → Offers, choose **Lovely Nail & Spa**, and save.
+   That writes `location: "lovely"` in Firestore `offers`. Casabella stays on
+   `location: "casabella"`.
+2. Services: in Firestore Content, choose Lovely so rows go to
+   `lovelyNailServices` with `salonname` `Lovely Nail & Spa`.
+3. Gallery: upload in Gallery Manager with salon name `Lovely Nail & Spa`,
+   then publish the public-read rule for `gallery`. Photos already stored in
+   `galleryImages` with that salon name show without the new rule.
+4. Promotions: create a Firestore Content promotion with `salonname`
+   `Lovely Nail & Spa`, `isActive: true`, and inclusive `startDate` / `endDate`.
+5. Leads: the homepage form creates `lovelyNailPromotionList` documents
+   (name, phone, email, consent, `salonname`, source `nailslovely.com`).
+   Deploy `firestore/lovely-promotion-list.rules` inside the existing rules.
+   Operatix → Firebase Alerts → Check now is what surfaces new signups.
+6. Chat: keep Operatix `/lovely-chat` published and embeddable. This site
+   iframes that page; staff reply at `/customer-chats`. The private chat
+   collection is written by the Operatix function, not by a key in this repo.
+7. Google reviews live in Operatix’s `GoogleReview` records, keyed by the
+   Base44 location id, and are not in this public Firestore project. The
+   homepage keeps its curated reviews.
+
+`firestore/lovely-shared-content.rules` is a prototype to merge. It is not a
+complete rules file. Public read is limited to marketing collections. Review
+it before publishing, and do not replace the database rules with that file.
 
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
