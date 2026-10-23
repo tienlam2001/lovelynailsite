@@ -8,6 +8,8 @@ import { ScrollReveal } from "./ScrollReveal";
 import { Gallery } from "./Gallery";
 import { getFirebaseMenu } from "./firebase-menu";
 import { MobileExperience } from "./MobileExperience";
+import { getSalonHours } from "./salon-hours";
+import { SalonHoursList, SalonToday } from "./SalonHours";
 
 export const dynamic = "force-dynamic";
 
@@ -436,14 +438,20 @@ const faqSchema: Record<string, unknown> = {
 };
 
 export default async function Home() {
-  const [liveMenu, offerFeed, marketingEvents] = await Promise.all([
+  const [liveMenu, offerFeed, marketingEvents, salonHours] = await Promise.all([
     getFirebaseMenu(menuSections),
     getFirebaseOffer(),
     getMarketingEvents(),
+    getSalonHours(),
   ]);
   const welcomeOffer = offerFeed.offer;
   const liveBusinessSchema = {
     ...localBusinessSchema,
+    openingHours: salonHours.openingHours,
+    openingHoursSpecification: salonHours.openingHoursSpecification,
+    ...(salonHours.specialOpeningHoursSpecification.length
+      ? { specialOpeningHoursSpecification: salonHours.specialOpeningHoursSpecification }
+      : {}),
     makesOffer: liveMenu.map((section) => ({
       "@type": "Offer",
       itemOffered: {
@@ -465,7 +473,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
-      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offerFeed={offerFeed} marketingEvents={marketingEvents} />
+      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offerFeed={offerFeed} marketingEvents={marketingEvents} salonHours={salonHours} />
       <CustomerChat />
       <ScrollReveal />
       <div className="desktop-experience">
@@ -539,8 +547,11 @@ export default async function Home() {
       </section>
 
       <section className="booking-strip" aria-label="Quick booking" data-reveal="fade-up">
-        <span>Ready when you are.</span>
-        <strong>Book your Winter Garden nail appointment online.</strong>
+        <div className="booking-copy">
+          <span>Ready when you are.</span>
+          <strong>Book your Winter Garden nail appointment online.</strong>
+          <SalonToday hours={salonHours} className="booking-hours" />
+        </div>
         <a className="button button-dark" href={bookingUrl}>
           Book Now
         </a>
@@ -731,6 +742,7 @@ export default async function Home() {
             The booking button takes customers directly to the online appointment
             page for Lovely Nail & Spa.
           </p>
+          <SalonToday hours={salonHours} />
         </div>
         <div className="appointment-actions">
           <a className="button" href={bookingUrl}>
@@ -781,6 +793,7 @@ export default async function Home() {
             <a href={`tel:${phone}`}>(407) 654-0254</a>
             <span>{address}</span>
             <span>Manicures · Pedicures · Waxing · Eyebrows</span>
+            <SalonHoursList hours={salonHours} />
             <a className="button button-full" href={directionsUrl} target="_blank" rel="noreferrer">
               Open Google Maps
             </a>
@@ -801,6 +814,10 @@ export default async function Home() {
           <img src="/ln-mark.jpg" alt="" />
           © 2026 Lovely Nail & Spa
         </span>
+        <div className="footer-hours">
+          <p>{salonHours.summary}</p>
+          {salonHours.todayNotice ? <p className="hours-notice" role="status">{salonHours.todayNotice}</p> : null}
+        </div>
         <a href={bookingUrl}>Book Now</a>
       </footer>
 

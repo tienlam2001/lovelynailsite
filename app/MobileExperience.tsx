@@ -8,11 +8,13 @@ import { PromotionSignup } from "./PromotionSignup";
 import type { OfferFeed } from "./firebase-offer";
 import type { MarketingEvent } from "./firebase-events";
 import { MarketingEvents } from "./MarketingEvents";
+import type { SalonHours } from "./salon-hours";
+import { SalonHoursList } from "./SalonHours";
 
 type Panel = "home" | "menu" | "gallery";
-type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offerFeed: OfferFeed; marketingEvents: MarketingEvent[] };
+type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offerFeed: OfferFeed; marketingEvents: MarketingEvent[]; salonHours: SalonHours };
 
-export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offerFeed, marketingEvents }: Props) {
+export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offerFeed, marketingEvents, salonHours }: Props) {
   const [panel, setPanel] = useState<Panel>("home");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -96,6 +98,7 @@ export function MobileExperience({ sections, photos, bookingUrl, phone, address,
             <a className="lm-action" href={directionsUrl} target="_blank" rel="noreferrer"><span aria-hidden="true">⌁</span>Get Directions</a>
           </nav>
           <p className="lm-address">{address}</p>
+          <SalonHoursList hours={salonHours} />
         </div>
         <section id="mobile-promotions" className="lm-promotions" aria-label="Current salon promotions"><PromotionalSlides bookingUrl={bookingUrl} offer={offerFeed.offer} status={offerFeed.status} /></section>
         <MarketingEvents events={marketingEvents} offerAnchor="#mobile-promotions" variant="mobile" />

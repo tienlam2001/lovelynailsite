@@ -495,6 +495,239 @@ export async function queryPublicMarketingEvents(
   }
 }
 
+const SALON_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+export type SalonDayKey = (typeof SALON_DAY_KEYS)[number];
+
+const SALON_DAY_SHORT: Record<SalonDayKey, string> = {
+  mon: "Mon",
+  tue: "Tue",
+  wed: "Wed",
+  thu: "Thu",
+  fri: "Fri",
+  sat: "Sat",
+  sun: "Sun",
+};
+
+const SALON_DAY_NAME: Record<SalonDayKey, string> = {
+  mon: "Monday",
+  tue: "Tuesday",
+  wed: "Wednesday",
+  thu: "Thursday",
+  fri: "Friday",
+  sat: "Saturday",
+  sun: "Sunday",
+};
+
+const SALON_DAY_ABBR: Record<SalonDayKey, string> = {
+  mon: "Mo",
+  tue: "Tu",
+  wed: "We",
+  thu: "Th",
+  fri: "Fr",
+  sat: "Sa",
+  sun: "Su",
+};
+
+/**
+ * This website did not render a weekly schedule. These hours are the published
+ * hours for Lovely Nail & Spa at 3317 Daniels Rd (Yelp, September 2026, and
+ * Loc8NearMe) and are used only when `salonHours/lovely` is missing or unreadable.
+ */
+const FALLBACK_WEEKLY: Record<SalonDayKey, { open: string; close: string; closed: boolean }> = {
+  mon: { open: "09:00", close: "19:00", closed: false },
+  tue: { open: "09:00", close: "19:00", closed: false },
+  wed: { open: "09:00", close: "19:00", closed: false },
+  thu: { open: "09:00", close: "19:00", closed: false },
+  fri: { open: "09:00", close: "19:00", closed: false },
+  sat: { open: "09:00", close: "19:00", closed: false },
+  sun: { open: "11:00", close: "17:00", closed: false },
+};
+
+export type SalonHoursLine = { label: string; value: string };
+
+export type SalonHours = {
+  timezone: string;
+  lines: SalonHoursLine[];
+  summary: string;
+  todayValue: string;
+  todayNotice: string;
+  source: "firestore" | "fallback";
+  openingHours: string[];
+  openingHoursSpecification: Record<string, unknown>[];
+  specialOpeningHoursSpecification: Record<string, unknown>[];
+};
+
+type ResolvedDay = { closed: boolean; open: string; close: string; value: string };
+
+function clock(value: unknown): string {
+  const raw = text(value);
+  const match = /^(\d{1,2}):([0-5]\d)$/.exec(raw);
+  if (!match) return "";
+  const hour = Number(match[1]);
+  if (hour > 23) return "";
+  return `${String(hour).padStart(2, "0")}:${match[2]}`;
+}
+
+/** 24-hour `HH:mm` as `9:30 AM`. */
+export function formatSalonTime(value: string): string {
+  const normalized = clock(value);
+  if (!normalized) return "";
+  const hour24 = Number(normalized.slice(0, 2));
+  const minute = normalized.slice(3);
+  const suffix = hour24 >= 12 ? "PM" : "AM";
+  const hour = hour24 % 12 || 12;
+  return `${hour}:${minute} ${suffix}`;
+}
+
+function dayRange(open: string, close: string): string {
+  return `${formatSalonTime(open)} – ${formatSalonTime(close)}`;
+}
+
+function resolveDay(day: unknown): ResolvedDay | null {
+  if (!day || typeof day !== "object" || Array.isArray(day)) return null;
+  const record = day as Record<string, unknown>;
+  if (flag(record.closed) === true) return { closed: true, open: "", close: "", value: "Closed" };
+  const open = clock(record.open);
+  const close = clock(record.close);
+  if (!open || !close || open >= close) return null;
+  return { closed: false, open, close, value: dayRange(open, close) };
+}
+
+function supportedTimeZone(value: unknown): string {
+  const zone = text(value) || "America/New_York";
+  try {
+    Intl.DateTimeFormat("en-US", { timeZone: zone }).format(new Date());
+    return zone;
+  } catch {
+    return "America/New_York";
+  }
+}
+
+function dateInTimeZone(now: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+function weekdayKey(now: Date, timeZone: string): SalonDayKey {
+  const name = new Intl.DateTimeFormat("en-US", { timeZone, weekday: "short" }).format(now);
+  const key = name.slice(0, 3).toLowerCase() as SalonDayKey;
+  return SALON_DAY_KEYS.includes(key) ? key : "fri";
+}
+
+function isoDate(value: unknown): string {
+  const date = text(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "";
+  const [year, month, day] = date.split("-").map(Number);
+  const utc = new Date(Date.UTC(year, month - 1, day));
+  if (utc.getUTCFullYear() !== year || utc.getUTCMonth() !== month - 1 || utc.getUTCDate() !== day) return "";
+  return date;
+}
+
+function groupDays(days: Record<SalonDayKey, ResolvedDay>): { keys: SalonDayKey[]; day: ResolvedDay }[] {
+  const groups: { keys: SalonDayKey[]; day: ResolvedDay }[] = [];
+  for (const key of SALON_DAY_KEYS) {
+    const day = days[key];
+    const last = groups[groups.length - 1];
+    if (last && last.day.value === day.value && last.day.open === day.open && last.day.close === day.close) last.keys.push(key);
+    else groups.push({ keys: [key], day });
+  }
+  return groups;
+}
+
+function hoursFromWeekly(
+  weekly: Record<SalonDayKey, ResolvedDay>,
+  specials: { date: string; day: ResolvedDay; note: string }[],
+  timezone: string,
+  source: SalonHours["source"],
+  now: Date,
+): SalonHours {
+  const groups = groupDays(weekly);
+  const lines = groups.map((group) => {
+    const first = SALON_DAY_SHORT[group.keys[0]];
+    const last = SALON_DAY_SHORT[group.keys[group.keys.length - 1]];
+    return { label: group.keys.length === 1 ? first : `${first}–${last}`, value: group.day.value };
+  });
+  const today = dateInTimeZone(now, timezone);
+  const todayKey = weekdayKey(now, timezone);
+  const special = specials.find((item) => item.date === today);
+  const todayDay = special?.day ?? weekly[todayKey];
+  const note = special ? text(special.note).slice(0, 240) : "";
+  const todayNotice = special
+    ? `Today’s hours: ${todayDay.value}${note ? `. ${note}` : "."}`
+    : "";
+  const openingHours = groups
+    .filter((group) => !group.day.closed)
+    .map((group) => {
+      const first = SALON_DAY_ABBR[group.keys[0]];
+      const last = SALON_DAY_ABBR[group.keys[group.keys.length - 1]];
+      const days = group.keys.length === 1 ? first : `${first}-${last}`;
+      return `${days} ${group.day.open}-${group.day.close}`;
+    });
+  const openingHoursSpecification = groups
+    .filter((group) => !group.day.closed)
+    .map((group) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: group.keys.map((key) => SALON_DAY_NAME[key]),
+      opens: group.day.open,
+      closes: group.day.close,
+    }));
+  const specialOpeningHoursSpecification = specials
+    .filter((item) => item.date >= today)
+    .map((item) => ({
+      "@type": "OpeningHoursSpecification",
+      validFrom: item.date,
+      validThrough: item.date,
+      ...(item.day.closed ? {} : { opens: item.day.open, closes: item.day.close }),
+    }));
+  return {
+    timezone,
+    lines,
+    summary: lines.map((line) => `${line.label} ${line.value}`).join(" · "),
+    todayValue: todayDay.value,
+    todayNotice,
+    source,
+    openingHours,
+    openingHoursSpecification,
+    specialOpeningHoursSpecification,
+  };
+}
+
+export function resolveSalonHours(fields: Record<string, unknown> | null | undefined, now = new Date()): SalonHours {
+  const timezone = supportedTimeZone(fields?.timezone);
+  const weeklyInput = fields?.weekly;
+  const parsed: Partial<Record<SalonDayKey, ResolvedDay>> = {};
+  if (weeklyInput && typeof weeklyInput === "object" && !Array.isArray(weeklyInput)) {
+    for (const key of SALON_DAY_KEYS) {
+      const day = resolveDay((weeklyInput as Record<string, unknown>)[key]);
+      if (day) parsed[key] = day;
+    }
+  }
+  if (SALON_DAY_KEYS.some((key) => !parsed[key])) {
+    const fallbackWeekly = Object.fromEntries(
+      SALON_DAY_KEYS.map((key) => [key, resolveDay(FALLBACK_WEEKLY[key])!]),
+    ) as Record<SalonDayKey, ResolvedDay>;
+    return hoursFromWeekly(fallbackWeekly, [], "America/New_York", "fallback", now);
+  }
+  const weekly = parsed as Record<SalonDayKey, ResolvedDay>;
+  const specials: { date: string; day: ResolvedDay; note: string }[] = [];
+  if (Array.isArray(fields?.specialHours)) {
+    for (const entry of fields.specialHours) {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) continue;
+      const record = entry as Record<string, unknown>;
+      const date = isoDate(record.date);
+      const day = resolveDay(record);
+      if (!date || !day) continue;
+      if (specials.some((item) => item.date === date)) continue;
+      specials.push({ date, day, note: text(record.note) });
+    }
+  }
+  return hoursFromWeekly(weekly, specials, timezone, "firestore", now);
+}
+
 export async function listCollection(
   collectionId: string,
   signal?: AbortSignal,

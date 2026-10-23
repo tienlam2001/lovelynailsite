@@ -13,6 +13,8 @@ const {
   isLovelyRecord,
   locationKey,
   menuSectionsFromDocuments,
+  formatSalonTime,
+  resolveSalonHours,
   upcomingMarketingEvents,
   welcomeOfferFromDocuments,
 } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
@@ -254,4 +256,92 @@ test("keeps upcoming and current public Lovely marketing events", () => {
   assert.equal(events[2].timing, "upcoming");
   assert.equal(events[2].offerId, "welcome");
   assert.equal(events[2].imageUrl, "https://example.com/event.png");
+});
+
+function salonWeek(overrides = {}) {
+  return {
+    mon: { open: "09:30", close: "19:00", closed: false },
+    tue: { open: "09:30", close: "19:00", closed: false },
+    wed: { open: "09:30", close: "19:00", closed: false },
+    thu: { open: "09:30", close: "19:00", closed: false },
+    fri: { open: "09:30", close: "19:00", closed: false },
+    sat: { open: "09:00", close: "18:00", closed: false },
+    sun: { open: "11:00", close: "17:00", closed: true },
+    ...overrides,
+  };
+}
+
+test("formats salon times as 9:30 AM", () => {
+  assert.equal(formatSalonTime("09:30"), "9:30 AM");
+  assert.equal(formatSalonTime("19:00"), "7:00 PM");
+  assert.equal(formatSalonTime("00:15"), "12:15 AM");
+  assert.equal(formatSalonTime("12:00"), "12:00 PM");
+  assert.equal(formatSalonTime("9:05"), "9:05 AM");
+  assert.equal(formatSalonTime("25:00"), "");
+});
+
+test("falls back to the published Lovely hours when the doc is missing or unusable", () => {
+  const missing = resolveSalonHours(null, now);
+  assert.equal(missing.source, "fallback");
+  assert.equal(missing.timezone, "America/New_York");
+  assert.equal(missing.summary, "Mon–Sat 9:00 AM – 7:00 PM · Sun 11:00 AM – 5:00 PM");
+  assert.equal(missing.todayValue, "9:00 AM – 7:00 PM");
+  assert.equal(missing.todayNotice, "");
+  assert.deepEqual(missing.openingHours, ["Mo-Sa 09:00-19:00", "Su 11:00-17:00"]);
+  const broken = resolveSalonHours({
+    timezone: "America/New_York",
+    weekly: { mon: { open: "nope", close: "later", closed: false } },
+    specialHours: [{ date: "2026-10-23", open: "10:00", close: "14:00", note: "Ignored" }],
+  }, now);
+  assert.equal(broken.source, "fallback");
+  assert.equal(broken.todayNotice, "");
+});
+
+test("uses weekly hours and announces today's special hours", () => {
+  const hours = resolveSalonHours({
+    timezone: "America/New_York",
+    weekly: salonWeek(),
+    specialHours: [
+      { date: "2026-10-22", open: "12:00", close: "16:00", closed: false, note: "Yesterday" },
+      { date: "2026-10-24", open: "10:00", close: "14:00", closed: false, note: "Tomorrow" },
+      { date: "2026-10-23", open: "10:00", close: "16:30", closed: false, note: "Holiday hours" },
+      { date: "2026-13-40", open: "10:00", close: "14:00", note: "Not a date" },
+    ],
+  }, now);
+  assert.equal(hours.source, "firestore");
+  assert.equal(hours.summary, "Mon–Fri 9:30 AM – 7:00 PM · Sat 9:00 AM – 6:00 PM · Sun Closed");
+  assert.equal(hours.todayValue, "10:00 AM – 4:30 PM");
+  assert.equal(hours.todayNotice, "Today’s hours: 10:00 AM – 4:30 PM. Holiday hours");
+  assert.deepEqual(hours.openingHours, ["Mo-Fr 09:30-19:00", "Sa 09:00-18:00"]);
+  assert.deepEqual(hours.specialOpeningHoursSpecification.map((item) => item.validFrom), ["2026-10-24", "2026-10-23"]);
+  assert.equal(hours.openingHoursSpecification[0].opens, "09:30");
+  assert.deepEqual(hours.openingHoursSpecification[0].dayOfWeek, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
+});
+
+test("lets the salon timezone and a closed special choose today's notice", () => {
+  const closed = resolveSalonHours({
+    timezone: "America/New_York",
+    weekly: salonWeek(),
+    specialHours: [{ date: "2026-10-23", closed: true, note: "Staff training" }],
+  }, now);
+  assert.equal(closed.todayNotice, "Today’s hours: Closed. Staff training");
+  assert.equal(closed.todayValue, "Closed");
+  assert.equal(closed.specialOpeningHoursSpecification[0].opens, undefined);
+  assert.equal(closed.specialOpeningHoursSpecification[0].validFrom, "2026-10-23");
+
+  const tokyo = resolveSalonHours({
+    timezone: "Asia/Tokyo",
+    weekly: salonWeek(),
+    specialHours: [{ date: "2026-10-24", open: "12:00", close: "15:00", note: "Tokyo Saturday" }],
+  }, now);
+  assert.equal(tokyo.timezone, "Asia/Tokyo");
+  assert.equal(tokyo.todayNotice, "Today’s hours: 12:00 PM – 3:00 PM. Tokyo Saturday");
+
+  const invalidZone = resolveSalonHours({
+    timezone: "Not/AZone",
+    weekly: salonWeek(),
+    specialHours: [{ date: "2026-10-23", open: "13:00", close: "17:00", note: "Still Friday in New York" }],
+  }, now);
+  assert.equal(invalidZone.timezone, "America/New_York");
+  assert.equal(invalidZone.todayNotice, "Today’s hours: 1:00 PM – 5:00 PM. Still Friday in New York");
 });

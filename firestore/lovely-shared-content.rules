@@ -22,6 +22,8 @@
 //   priceFrom, sectionOrder, itemOrder, optional active
 // - lovelyNailPromotionList/{id}: validated public create only
 //   (see lovely-promotion-list.rules)
+// - salonHours/{salonId}: weekly mon..sun {open, close, closed}, specialHours,
+//   timezone. Public marketing hours for Lovely (`lovely`) and the other salons.
 
 rules_version = '2';
 service cloud.firestore {
@@ -65,6 +67,11 @@ service cloud.firestore {
     // Composite index: location ASC, isPublic ASC, startDate ASC.
     match /marketingEvents/{eventId} {
       allow read: if resource.data.isPublic == true;
+      allow write: if isAdmin();
+    }
+
+    match /salonHours/{salonId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
   }

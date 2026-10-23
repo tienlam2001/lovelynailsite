@@ -696,7 +696,7 @@ h3 {
 
 .booking-strip {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 1rem;
   width: min(1180px, calc(100% - 32px));
@@ -709,6 +709,26 @@ h3 {
 
 .booking-strip span {
   color: rgba(255, 249, 244, 0.72);
+}
+
+.booking-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.booking-copy strong {
+  font-size: 1.05rem;
+}
+
+.booking-hours,
+.salon-today {
+  margin: 0.15rem 0 0;
+}
+
+.booking-strip .hours-notice {
+  margin: 0.45rem 0 0;
+  background: rgba(255, 249, 244, 0.14);
+  color: #fff9f4;
 }
 
 .split-section {
@@ -1595,6 +1615,62 @@ h3 {
   object-fit: cover;
 }
 
+.footer-hours {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: center;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.footer-hours p {
+  margin: 0;
+}
+
+.salon-hours .eyebrow {
+  margin-bottom: 0.55rem;
+}
+
+.salon-hours ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.salon-hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.salon-hours li strong {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.hours-notice {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.9rem;
+  background: rgba(234, 207, 199, 0.55);
+  color: var(--rose-dark);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.appointment-panel .salon-today,
+.appointment-panel .hours-notice {
+  margin-top: 1rem;
+}
+
+.appointment-panel .hours-notice {
+  color: var(--rose-dark);
+}
+
 .mobile-action-bar {
   position: fixed;
   right: max(0.75rem, env(safe-area-inset-right));
@@ -1960,6 +2036,11 @@ h3 {
     flex-direction: column;
     align-items: flex-start;
     padding-bottom: 6.25rem;
+  }
+
+  .footer-hours {
+    justify-items: start;
+    text-align: left;
   }
 
   .mobile-action-bar {

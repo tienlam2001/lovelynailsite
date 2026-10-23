@@ -23,6 +23,9 @@
   .lm-action-gold span { color: var(--blush); }
   .lm-action:active { transform: scale(.985); }
   .lm-address { text-align: center; font-size: .75rem; color: var(--muted); line-height: 1.6; margin: 20px 0 0; }
+  .lm-home-card .salon-hours { margin-top: 16px; }
+  .lm-home-card .salon-hours .eyebrow { margin-bottom: 8px; text-align: center; }
+  .lm-home-card .hours-notice { text-align: center; }
   .lm-panel { z-index: 2; background: radial-gradient(ellipse at top left, rgba(234, 207, 199, .30), transparent 36rem), var(--background); padding-top: 0; transform: translateX(-100%); visibility: hidden; transition: transform 320ms cubic-bezier(.22, .7, .25, 1), visibility 0s 320ms; }
   .lm-panel.lm-active { transform: translateX(0); visibility: visible; transition: transform 320ms cubic-bezier(.22, .7, .25, 1), visibility 0s; }
   .lm-panel-bar { position: sticky; top: 0; z-index: 3; padding: max(12px, env(safe-area-inset-top)) 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(251, 248, 244, .92); border-bottom: 1px solid var(--lm-edge); backdrop-filter: blur(18px); }
@@ -110,7 +113,7 @@
   .lm-brand > p:last-child { margin-bottom: 0; }
   .lm-home-actions { gap: 8px; }
   .lm-action { min-height: 48px; padding: 10px 24px; }
-  .lm-address { grid-column: 1/-1; margin: 0; }
+  .lm-address, .lm-home-card .salon-hours { grid-column: 1/-1; margin: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -85,6 +85,26 @@ If `offerId` is set, the card links to the on-page offer. The section is
 omitted when nothing is upcoming or the query fails, including while the
 composite index is still building.
 
+## Business hours
+
+The homepage reads `salonHours/lovely`. `weekly` is `mon` through `sun`, each
+`{ open: "HH:mm", close: "HH:mm", closed: bool }`. `specialHours` is a list of
+`{ date: "YYYY-MM-DD", open, close, closed, note }`. `timezone` is an IANA name;
+a missing or invalid zone uses America/New_York. Times are shown as `9:30 AM`.
+When a special-hours date is today in that timezone, the booking strip, contact
+card, footer, and phone home show that notice. schema.org `openingHours` follows
+the weekly schedule, and `specialOpeningHoursSpecification` lists today’s and
+upcoming exceptions.
+
+This site had no hours in the footer, contact card, booking strip, or JSON-LD.
+If the document is missing or the read fails, those places use the schedule
+published for 3317 Daniels Rd: Monday–Saturday 9:00 AM–7:00 PM and Sunday
+11:00 AM–5:00 PM (Yelp, September 2026, and Loc8NearMe). A public read of
+`salonHours` is still denied until the rule in
+`firestore/lovely-shared-content.rules` is merged, so the site shows that
+fallback until then. Save the Lovely week in Operatix on `salonHours/lovely`
+and publish the public-read rule to replace it.
+
 Offer posters support 900 × 1400 px portrait artwork. The homepage preview uses
 a roomy 16:10 landscape card, with the entire image centered inside without
 cropping or stretching. Cards resize for phones, tablets, and desktops. The popup
@@ -144,18 +164,20 @@ appear on the next page load.
    `galleryImages` with that salon name show without the new rule.
 4. Promotions: create a Firestore Content promotion with `salonname`
    `Lovely Nail & Spa`, `isActive: true`, and inclusive `startDate` / `endDate`.
-5. Marketing events: save a `marketingEvents` document with `location` `lovely`
+5. Hours: save `salonHours/lovely` with `weekly` (`mon`–`sun`), optional
+   `specialHours`, and `timezone`. Merge the public-read rule for `salonHours`.
+6. Marketing events: save a `marketingEvents` document with `location` `lovely`
    or `all`, `isPublic: true`, and a `startDate`. Set `offerId` to the offer
    document id when the event should link to that offer. Keep the composite
    index `location` + `isPublic` + `startDate` enabled.
-6. Leads: the homepage form creates `lovelyNailPromotionList` documents
+7. Leads: the homepage form creates `lovelyNailPromotionList` documents
    (name, phone, email, consent, `salonname`, source `nailslovely.com`).
    Deploy `firestore/lovely-promotion-list.rules` inside the existing rules.
    Operatix → Firebase Alerts → Check now is what surfaces new signups.
-7. Chat: keep Operatix `/lovely-chat` published and embeddable. This site
+8. Chat: keep Operatix `/lovely-chat` published and embeddable. This site
    iframes that page; staff reply at `/customer-chats`. The private chat
    collection is written by the Operatix function, not by a key in this repo.
-8. Google reviews live in Operatix’s `GoogleReview` records, keyed by the
+9. Google reviews live in Operatix’s `GoogleReview` records, keyed by the
    Base44 location id, and are not in this public Firestore project. The
    homepage keeps its curated reviews.
 
