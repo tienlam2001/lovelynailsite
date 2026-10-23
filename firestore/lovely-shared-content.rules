@@ -59,5 +59,13 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Public list/get is allowed only for published events. Every website
+    // query must filter isPublic == true or Firestore rejects it.
+    // Composite index: location ASC, isPublic ASC, startDate ASC.
+    match /marketingEvents/{eventId} {
+      allow read: if resource.data.isPublic == true;
+      allow write: if isAdmin();
+    }
   }
 }

@@ -209,6 +209,66 @@ a {
   grid-template-columns: 1fr;
 }
 
+.events-section {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(234, 207, 199, 0.28), transparent 9rem),
+    #fffdf9;
+  box-shadow: var(--shadow);
+}
+
+.event-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: #fff;
+}
+
+.event-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.25rem 1.35rem 1.45rem;
+}
+
+.event-card h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.event-card p,
+.event-date,
+.event-scope {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.event-card .button {
+  align-self: flex-start;
+  margin-top: 0.35rem;
+}
+
 .announcement-popup h2 {
   max-width: 460px;
   margin-bottom: 1rem;
@@ -1639,7 +1699,8 @@ h3 {
   }
 
   .reviews-summary,
-  .reviews-grid {
+  .reviews-grid,
+  .events-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1776,7 +1837,8 @@ h3 {
   .menu-grid,
   .gallery-grid,
   .reviews-summary,
-  .reviews-grid {
+  .reviews-grid,
+  .events-grid {
     grid-template-columns: 1fr;
   }
 

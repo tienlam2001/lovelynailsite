@@ -6,11 +6,13 @@ import { galleryCategory, useSalonGallery, type GalleryItem } from "./salon-gall
 import { PromotionalSlides } from "./AnnouncementPopup";
 import { PromotionSignup } from "./PromotionSignup";
 import type { OfferFeed } from "./firebase-offer";
+import type { MarketingEvent } from "./firebase-events";
+import { MarketingEvents } from "./MarketingEvents";
 
 type Panel = "home" | "menu" | "gallery";
-type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offerFeed: OfferFeed };
+type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offerFeed: OfferFeed; marketingEvents: MarketingEvent[] };
 
-export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offerFeed }: Props) {
+export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offerFeed, marketingEvents }: Props) {
   const [panel, setPanel] = useState<Panel>("home");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -95,7 +97,8 @@ export function MobileExperience({ sections, photos, bookingUrl, phone, address,
           </nav>
           <p className="lm-address">{address}</p>
         </div>
-        <section className="lm-promotions" aria-label="Current salon promotions"><PromotionalSlides bookingUrl={bookingUrl} offer={offerFeed.offer} status={offerFeed.status} /></section>
+        <section id="mobile-promotions" className="lm-promotions" aria-label="Current salon promotions"><PromotionalSlides bookingUrl={bookingUrl} offer={offerFeed.offer} status={offerFeed.status} /></section>
+        <MarketingEvents events={marketingEvents} offerAnchor="#mobile-promotions" variant="mobile" />
         <div className="lm-signup"><PromotionSignup idPrefix="mobile-promotion" /></div>
       </section>
 

@@ -1,5 +1,7 @@
 import { AnnouncementPopup, PromotionalSlides } from "./AnnouncementPopup";
 import { getFirebaseOffer } from "./firebase-offer";
+import { getMarketingEvents } from "./firebase-events";
+import { MarketingEvents } from "./MarketingEvents";
 import { PromotionSignup } from "./PromotionSignup";
 import { CustomerChat } from "./CustomerChat";
 import { ScrollReveal } from "./ScrollReveal";
@@ -434,9 +436,10 @@ const faqSchema: Record<string, unknown> = {
 };
 
 export default async function Home() {
-  const [liveMenu, offerFeed] = await Promise.all([
+  const [liveMenu, offerFeed, marketingEvents] = await Promise.all([
     getFirebaseMenu(menuSections),
     getFirebaseOffer(),
+    getMarketingEvents(),
   ]);
   const welcomeOffer = offerFeed.offer;
   const liveBusinessSchema = {
@@ -462,7 +465,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
-      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offerFeed={offerFeed} />
+      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offerFeed={offerFeed} marketingEvents={marketingEvents} />
       <CustomerChat />
       <ScrollReveal />
       <div className="desktop-experience">
@@ -715,6 +718,8 @@ export default async function Home() {
       <section id="promotions" className="section-pad promo-section">
         <PromotionalSlides bookingUrl={bookingUrl} offer={welcomeOffer} status={offerFeed.status} />
       </section>
+
+      <MarketingEvents events={marketingEvents} />
 
       <PromotionSignup />
 

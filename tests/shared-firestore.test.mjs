@@ -13,6 +13,7 @@ const {
   isLovelyRecord,
   locationKey,
   menuSectionsFromDocuments,
+  upcomingMarketingEvents,
   welcomeOfferFromDocuments,
 } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
 
@@ -192,4 +193,65 @@ test("filters gallery and services to Lovely", () => {
   assert.equal(menu[0].title, "Pedicures");
   assert.equal(menu[0].featured, true);
   assert.deepEqual(menu[0].items, [["Classic Pedicure", "$33", "Spa soak and massage."]]);
+});
+
+test("keeps upcoming and current public Lovely marketing events", () => {
+  const event = (id, fields) => document(id, fields);
+  const events = upcomingMarketingEvents([
+    event("past", {
+      title: stringField("Past manicure night"),
+      location: stringField("lovely"),
+      isPublic: { booleanValue: true },
+      startDate: stringField("2026-10-01"),
+      endDate: stringField("2026-10-22"),
+    }),
+    event("private", {
+      title: stringField("Staff meeting"),
+      location: stringField("lovely"),
+      isPublic: { booleanValue: false },
+      startDate: stringField("2026-10-24"),
+    }),
+    event("casabella", {
+      title: stringField("Casabella trunk show"),
+      location: stringField("casabella"),
+      isPublic: { booleanValue: true },
+      startDate: stringField("2026-10-30"),
+    }),
+    event("current", {
+      title: stringField("Weekday glow"),
+      location: stringField("lovely"),
+      isPublic: { booleanValue: true },
+      startDate: stringField("2026-10-20"),
+      endDate: stringField("2026-10-23"),
+      offerId: stringField("lovely"),
+      type: stringField("Promotion"),
+      description: stringField("A Lovely weekday event."),
+    }),
+    event("all-salons", {
+      title: stringField("Holiday preview"),
+      location: stringField("all"),
+      isPublic: { booleanValue: true },
+      startDate: { timestampValue: "2026-10-24T03:30:00Z" },
+      offer_id: stringField("not a safe id"),
+    }),
+    event("later", {
+      title: stringField("November set"),
+      location: stringField("lovely"),
+      isPublic: { booleanValue: true },
+      startDate: stringField("2026-11-02"),
+      imageUrl: stringField("https://example.com/event.png"),
+      offerId: stringField("welcome"),
+    }),
+  ], now);
+  assert.deepEqual(events.map((item) => item.title), ["Weekday glow", "Holiday preview", "November set"]);
+  assert.equal(events[0].timing, "current");
+  assert.equal(events[0].offerId, "lovely");
+  assert.equal(events[0].eventType, "Promotion");
+  assert.equal(events[1].location, "all");
+  assert.equal(events[1].startDate, "2026-10-23");
+  assert.equal(events[1].timing, "current");
+  assert.equal(events[1].offerId, "");
+  assert.equal(events[2].timing, "upcoming");
+  assert.equal(events[2].offerId, "welcome");
+  assert.equal(events[2].imageUrl, "https://example.com/event.png");
 });

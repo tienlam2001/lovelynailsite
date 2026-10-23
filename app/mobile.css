@@ -65,6 +65,10 @@
   .lm-lightbox-close { position: absolute; top: 10px; right: 12px; min-width: 44px; min-height: 44px; border: 1px solid var(--lm-edge); border-radius: 50%; background: var(--cream); color: var(--rose-dark); font-size: 1.4rem; cursor: pointer; }
   .lovely-mobile :focus-visible { outline: 2px solid var(--rose-dark); outline-offset: 3px; }
   .lm-promotions { display: grid; gap: 18px; max-width: 560px; margin: 28px auto; }
+  .lm-events { display: grid; gap: 14px; max-width: 560px; margin: 8px auto 28px; }
+  .lm-events .events-grid { grid-template-columns: 1fr; }
+  .lm-events .section-heading h2 { margin: 0 0 4px; font-size: 1.8rem; }
+  .lm-events [data-reveal] { opacity: 1; transform: none; }
   .lm-promotions .promo-card { padding: 24px; }
   .lm-promotions .promo-card h2 { font-size: 1.8rem; }
   .lm-promotions .promo-offer-preview { aspect-ratio: 16/10; }

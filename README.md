@@ -69,6 +69,22 @@ appointment link. When nothing active is published, the promotion card says so.
 When Firestore cannot be reached, it says offers are unavailable. Neither state
 invents a discount.
 
+## Marketing events
+
+Operatix writes public events to `marketingEvents`. The site runs one structured
+query: `location in ["lovely", "all"]`, `isPublic == true`, ordered by
+`startDate`. That `isPublic` filter is required; the rules allow a public read
+only when it is true, and an unfiltered list is denied. The composite index is
+`location`, `isPublic`, `startDate`.
+
+An event is shown when its end (or start, if it has no end) is today or later
+in America/New_York. `startDate` and `endDate` are `YYYY-MM-DD` or timestamps.
+Cards use `title`, `description` (or `summary` / `notes`), `type`, and an HTTPS
+`imageUrl`. `location: "all"` is included and labeled as every Operatix salon.
+If `offerId` is set, the card links to the on-page offer. The section is
+omitted when nothing is upcoming or the query fails, including while the
+composite index is still building.
+
 Offer posters support 900 × 1400 px portrait artwork. The homepage preview uses
 a roomy 16:10 landscape card, with the entire image centered inside without
 cropping or stretching. Cards resize for phones, tablets, and desktops. The popup
@@ -128,14 +144,18 @@ appear on the next page load.
    `galleryImages` with that salon name show without the new rule.
 4. Promotions: create a Firestore Content promotion with `salonname`
    `Lovely Nail & Spa`, `isActive: true`, and inclusive `startDate` / `endDate`.
-5. Leads: the homepage form creates `lovelyNailPromotionList` documents
+5. Marketing events: save a `marketingEvents` document with `location` `lovely`
+   or `all`, `isPublic: true`, and a `startDate`. Set `offerId` to the offer
+   document id when the event should link to that offer. Keep the composite
+   index `location` + `isPublic` + `startDate` enabled.
+6. Leads: the homepage form creates `lovelyNailPromotionList` documents
    (name, phone, email, consent, `salonname`, source `nailslovely.com`).
    Deploy `firestore/lovely-promotion-list.rules` inside the existing rules.
    Operatix → Firebase Alerts → Check now is what surfaces new signups.
-6. Chat: keep Operatix `/lovely-chat` published and embeddable. This site
+7. Chat: keep Operatix `/lovely-chat` published and embeddable. This site
    iframes that page; staff reply at `/customer-chats`. The private chat
    collection is written by the Operatix function, not by a key in this repo.
-7. Google reviews live in Operatix’s `GoogleReview` records, keyed by the
+8. Google reviews live in Operatix’s `GoogleReview` records, keyed by the
    Base44 location id, and are not in this public Firestore project. The
    homepage keeps its curated reviews.
 

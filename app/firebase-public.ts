@@ -370,6 +370,131 @@ export function menuSectionsFromDocuments(documents: FirestoreDocument[]): MenuS
     }));
 }
 
+export type MarketingEvent = {
+  id: string;
+  title: string;
+  summary: string;
+  eventType: string;
+  location: "lovely" | "all";
+  startDate: string;
+  endDate: string;
+  timing: "current" | "upcoming";
+  offerId: string;
+  offerTitle: string;
+  imageUrl: string;
+};
+
+function eventDate(value: unknown): string {
+  const raw = text(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) {
+    const parsed = new Date(raw);
+    if (!Number.isNaN(parsed.getTime())) return salonDate(parsed);
+  }
+  return "";
+}
+
+export function formatEventDates(startDate: string, endDate: string): string {
+  const format = (iso: string) => {
+    const [year, month, day] = iso.split("-").map(Number);
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(year, month - 1, day)));
+  };
+  if (!endDate || endDate === startDate) return format(startDate);
+  return `${format(startDate)} – ${format(endDate)}`;
+}
+
+export function upcomingMarketingEvents(documents: FirestoreDocument[], now = new Date()): MarketingEvent[] {
+  const today = salonDate(now);
+  const events: MarketingEvent[] = [];
+  for (const document of documents) {
+    const fields = decodeFields(document.fields ?? {});
+    if (flag(fields.isPublic) !== true) continue;
+    const location = text(fields.location).toLowerCase();
+    if (location !== "lovely" && location !== "all") continue;
+    const startDate = eventDate(fields.startDate);
+    if (!startDate) continue;
+    const endCandidate = eventDate(fields.endDate) || eventDate(fields.end_date);
+    const endDate = endCandidate && endCandidate >= startDate ? endCandidate : startDate;
+    if (endDate < today) continue;
+    const title = text(fields.title);
+    if (!title) continue;
+    const summary = text(fields.description) || text(fields.summary) || text(fields.notes)
+      || text(fields.details) || text(fields.offerDetail) || text(fields.offer_detail);
+    const offerId = text(fields.offerId) || text(fields.offer_id);
+    events.push({
+      id: documentId(document.name),
+      title,
+      summary,
+      eventType: text(fields.eventType) || text(fields.type) || text(fields.category),
+      location,
+      startDate,
+      endDate,
+      timing: startDate <= today ? "current" : "upcoming",
+      offerId: /^[A-Za-z0-9_-]{1,200}$/.test(offerId) ? offerId : "",
+      offerTitle: "",
+      imageUrl: httpsUrl(fields.imageUrl) || httpsUrl(fields.image_url),
+    });
+  }
+  return events;
+}
+
+export async function queryPublicMarketingEvents(
+  signal?: AbortSignal,
+): Promise<{ ok: true; documents: FirestoreDocument[] } | { ok: false }> {
+  try {
+    const response = await fetch(
+      `https://firestore.googleapis.com/v1/${firebaseDatabasePath()}/documents:runQuery`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        signal,
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: "marketingEvents" }],
+            where: {
+              compositeFilter: {
+                op: "AND",
+                filters: [
+                  {
+                    fieldFilter: {
+                      field: { fieldPath: "isPublic" },
+                      op: "EQUAL",
+                      value: { booleanValue: true },
+                    },
+                  },
+                  {
+                    fieldFilter: {
+                      field: { fieldPath: "location" },
+                      op: "IN",
+                      value: {
+                        arrayValue: {
+                          values: [{ stringValue: "lovely" }, { stringValue: "all" }],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            orderBy: [{ field: { fieldPath: "startDate" }, direction: "ASCENDING" }],
+          },
+        }),
+      },
+    );
+    if (!response.ok) return { ok: false };
+    const rows = await response.json() as { document?: FirestoreDocument }[];
+    return { ok: true, documents: rows.flatMap((row) => row.document ? [row.document] : []) };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function listCollection(
   collectionId: string,
   signal?: AbortSignal,
