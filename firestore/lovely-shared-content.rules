@@ -1,0 +1,85 @@
+// Prototype merge snippet for the shared Firestore database
+// `casabellanailsspawebsite` / `(default)`.
+//
+// Do not deploy this file as the entire ruleset. Paste the match blocks into
+// the existing rules, inside `match /databases/{database}/documents`, and keep
+// the current `isAdmin()` helper:
+//   request.auth != null && request.auth.token.admin == true
+//
+// Public read is intentional. Lovely Nail & Spa and Casabella Nail & Spa are
+// public marketing sites and must list these collections without a login.
+// Customer chats and promotion-list reads stay private.
+//
+// Assumed data model
+// - offers/{id}: location ("lovely" | "casabella"), title, message, badge,
+//   kicker, ctaLabel, ctaPath, imageUrl, slideDurationMs, slides[],
+//   optional enabled/active/isActive/status/startDate/endDate
+// - promotions/{id}: salonname, business, title, description, offer, imageUrl,
+//   isActive, startDate, endDate
+// - gallery/{id}: older Gallery Manager uploads. salonname, imageUrl, alt or title
+// - galleryImages/{id}: imageUrl, caption (or alt/title), category, location
+//   ("lovely" | "all"), isPublic, sortOrder. Older docs may use salonname and
+//   omit isPublic/location. Website query: isPublic == true, location in
+//   ["lovely","all"], orderBy sortOrder. Composite index: isPublic ASC,
+//   location ASC, sortOrder ASC.
+// - lovelyNailServices/{id} and services/{id}: salonname, name, category,
+//   priceFrom, sectionOrder, itemOrder, optional active
+// - lovelyNailPromotionList/{id}: validated public create only
+//   (see lovely-promotion-list.rules)
+// - salonHours/{salonId}: weekly mon..sun {open, close, closed}, specialHours,
+//   timezone. Public marketing hours for Lovely (`lovely`) and the other salons.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /offers/{offerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /promotions/{promotionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Public queries must include isPublic == true. Documents written before
+    // that field existed stay readable so current salon photos are not hidden.
+    match /galleryImages/{imageId} {
+      allow read: if resource.data.isPublic == true
+        || !resource.data.keys().hasAny(['isPublic']);
+      allow write: if isAdmin();
+    }
+
+    match /lovelyNailServices/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Public list/get is allowed only for published events. Every website
+    // query must filter isPublic == true or Firestore rejects it.
+    // Composite index: location ASC, isPublic ASC, startDate ASC.
+    match /marketingEvents/{eventId} {
+      allow read: if resource.data.isPublic == true;
+      allow write: if isAdmin();
+    }
+
+    match /salonHours/{salonId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

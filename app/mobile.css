@@ -23,6 +23,9 @@
   .lm-action-gold span { color: var(--blush); }
   .lm-action:active { transform: scale(.985); }
   .lm-address { text-align: center; font-size: .75rem; color: var(--muted); line-height: 1.6; margin: 20px 0 0; }
+  .lm-home-card .salon-hours { margin-top: 16px; }
+  .lm-home-card .salon-hours .eyebrow { margin-bottom: 8px; text-align: center; }
+  .lm-home-card .hours-notice { text-align: center; }
   .lm-panel { z-index: 2; background: radial-gradient(ellipse at top left, rgba(234, 207, 199, .30), transparent 36rem), var(--background); padding-top: 0; transform: translateX(-100%); visibility: hidden; transition: transform 320ms cubic-bezier(.22, .7, .25, 1), visibility 0s 320ms; }
   .lm-panel.lm-active { transform: translateX(0); visibility: visible; transition: transform 320ms cubic-bezier(.22, .7, .25, 1), visibility 0s; }
   .lm-panel-bar { position: sticky; top: 0; z-index: 3; padding: max(12px, env(safe-area-inset-top)) 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(251, 248, 244, .92); border-bottom: 1px solid var(--lm-edge); backdrop-filter: blur(18px); }
@@ -65,6 +68,10 @@
   .lm-lightbox-close { position: absolute; top: 10px; right: 12px; min-width: 44px; min-height: 44px; border: 1px solid var(--lm-edge); border-radius: 50%; background: var(--cream); color: var(--rose-dark); font-size: 1.4rem; cursor: pointer; }
   .lovely-mobile :focus-visible { outline: 2px solid var(--rose-dark); outline-offset: 3px; }
   .lm-promotions { display: grid; gap: 18px; max-width: 560px; margin: 28px auto; }
+  .lm-events { display: grid; gap: 14px; max-width: 560px; margin: 8px auto 28px; }
+  .lm-events .events-grid { grid-template-columns: 1fr; }
+  .lm-events .section-heading h2 { margin: 0 0 4px; font-size: 1.8rem; }
+  .lm-events [data-reveal] { opacity: 1; transform: none; }
   .lm-promotions .promo-card { padding: 24px; }
   .lm-promotions .promo-card h2 { font-size: 1.8rem; }
   .lm-promotions .promo-offer-preview { aspect-ratio: 16/10; }
@@ -106,7 +113,7 @@
   .lm-brand > p:last-child { margin-bottom: 0; }
   .lm-home-actions { gap: 8px; }
   .lm-action { min-height: 48px; padding: 10px 24px; }
-  .lm-address { grid-column: 1/-1; margin: 0; }
+  .lm-address, .lm-home-card .salon-hours { grid-column: 1/-1; margin: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

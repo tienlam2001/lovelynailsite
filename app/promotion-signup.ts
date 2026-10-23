@@ -24,9 +24,15 @@ export function validatePromotionSignup(input: PromotionSignup): PromotionSignup
   return { name, phone, email, emailConsent: true, smsConsent: input.smsConsent };
 }
 
+function promotionDatabase(): string {
+  const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || "casabellanailsspawebsite";
+  const database = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID || process.env.FIREBASE_DATABASE_ID || "(default)";
+  return `projects/${/^[a-z0-9-]+$/.test(project) ? project : "casabellanailsspawebsite"}/databases/${database === "(default)" || /^[A-Za-z0-9_-]+$/.test(database) ? database : "(default)"}`;
+}
+
 export async function savePromotionSignup(input: PromotionSignup): Promise<void> {
   const signup = validatePromotionSignup(input);
-  const database = "projects/casabellanailsspawebsite/databases/(default)";
+  const database = promotionDatabase();
   const stringField = (value: string) => ({ stringValue: value });
   const response = await fetch(`https://firestore.googleapis.com/v1/${database}/documents:commit`, {
     method: "POST",

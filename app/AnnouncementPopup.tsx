@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { offerHref, type WelcomeOffer } from "./firebase-offer";
+import { offerHref, type OfferFeedStatus, type WelcomeOffer } from "./firebase-offer";
 
 type AnnouncementPopupProps = {
   bookingUrl: string;
   offer: WelcomeOffer | null;
+};
+
+type PromotionalSlidesProps = AnnouncementPopupProps & {
+  status?: OfferFeedStatus;
 };
 
 const storageKey = "lovely-welcome-offer-dismissed";
@@ -134,14 +138,14 @@ export function AnnouncementPopup({ bookingUrl, offer }: AnnouncementPopupProps)
   );
 }
 
-export function PromotionalSlides({ bookingUrl, offer }: AnnouncementPopupProps) {
+export function PromotionalSlides({ bookingUrl, offer, status = offer ? "ready" : "empty" }: PromotionalSlidesProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(true);
   const slides = offer?.slides ?? [];
   const activeIndex = slides.length ? index % slides.length : 0;
-  const slide = slides[activeIndex];
+  const slide = status === "ready" ? slides[activeIndex] : undefined;
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -158,10 +162,14 @@ export function PromotionalSlides({ bookingUrl, offer }: AnnouncementPopupProps)
   }, [offer, slides.length, paused, interacting, reducedMotion]);
 
   if (!slide) return (
-    <div className="promo-card" data-reveal="fade-up">
-      <p className="eyebrow">Your next moment of self-care</p>
-      <h2>Make time for something lovely.</h2>
-      <p>Book your next manicure or pedicure in Winter Garden.</p>
+    <div className="promo-card" data-reveal="fade-up" role="status">
+      <p className="eyebrow">Promotions</p>
+      <h2>{status === "unavailable" ? "Offers are temporarily unavailable." : "No Lovely offer is posted right now."}</h2>
+      <p>
+        {status === "unavailable"
+          ? "You can still book an appointment while the shared offer list is unreachable."
+          : "New offers saved for Lovely Nail & Spa in Operatix will appear here. You can still book a visit."}
+      </p>
       <a className="button" href={bookingUrl}>Book Appointment</a>
     </div>
   );
