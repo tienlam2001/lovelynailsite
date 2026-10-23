@@ -139,18 +139,24 @@ Publish the Operatix chat function/pages before publishing this website widget.
 
 ## Shared gallery
 
-The gallery reads two public collections in `casabellanailsspawebsite` /
-`(default)`: Operatix Gallery Manager’s `gallery` collection, then the existing
-`galleryImages` collection. No service-account key is used. Set `salonname` to
-`Lovely Nail & Spa`. Each record needs an HTTPS `imageUrl`. `alt` or `title`
-is the accessible description; `category` or the first `tags` entry groups
-mobile filters. `featured` and `sortOrder` control order. `active: false` or
-`hidden: true` omits a photo. Casabella-labeled photos are excluded. `gallery`
-is not publicly readable until the rule in
-`firestore/lovely-shared-content.rules` is merged, so Operatix uploads stay
-hidden until that rule is published. When no Lovely records exist or Firebase
-cannot be reached, the nine existing Lovely photos remain visible. New records
-appear on the next page load.
+The gallery reads `galleryImages` in `casabellanailsspawebsite` / `(default)`.
+The public query is `isPublic == true`, `location in ["lovely", "all"]`,
+ordered by `sortOrder`. Each photo needs an HTTPS `imageUrl`. `caption` is the
+accessible description (`alt` or `title` still work on older documents).
+`category`, or the first `tags` entry, groups the phone filters. `location:
+"all"` is included. Casabella and `isPublic: false` are omitted. Older Lovely
+documents that only have `salonname` and no `isPublic` field still match, so
+photos saved before this shape are not dropped. `active: false` or
+`hidden: true` omits a photo.
+
+Images may be hosted on `media.base44.com` or `firebasestorage.googleapis.com`.
+Both hosts are allowed in `images.remotePatterns` and in the page
+`Content-Security-Policy` `img-src`. The nine local Lovely photos stay visible
+when the query and the legacy list return nothing or cannot be reached. New
+records appear on the next page load. The ordered query needs the composite
+index `isPublic` + `location` + `sortOrder`. Until that index exists, Firestore
+rejects the ordered query and the page uses older Lovely `galleryImages`
+documents, then the nine local photos.
 
 ## What the owner sets in Operatix
 
@@ -159,9 +165,11 @@ appear on the next page load.
    `location: "casabella"`.
 2. Services: in Firestore Content, choose Lovely so rows go to
    `lovelyNailServices` with `salonname` `Lovely Nail & Spa`.
-3. Gallery: upload in Gallery Manager with salon name `Lovely Nail & Spa`,
-   then publish the public-read rule for `gallery`. Photos already stored in
-   `galleryImages` with that salon name show without the new rule.
+3. Gallery: save `galleryImages` with `imageUrl`, `caption`, `category`,
+   `location` `lovely` or `all`, `isPublic: true`, and `sortOrder`. Host the
+   file on `media.base44.com` or `firebasestorage.googleapis.com`. Merge the
+   `galleryImages` rule and keep the composite index `isPublic` + `location` +
+   `sortOrder`. Older Lovely photos that only have `salonname` still show.
 4. Promotions: create a Firestore Content promotion with `salonname`
    `Lovely Nail & Spa`, `isActive: true`, and inclusive `startDate` / `endDate`.
 5. Hours: save `salonHours/lovely` with `weekly` (`mon`–`sun`), optional

@@ -166,6 +166,46 @@ test("filters gallery and services to Lovely", () => {
   ]);
   assert.deepEqual(photos, [{ title: "Blush floral set", image: "https://example.com/lovely.jpg", category: "Floral" }]);
 
+  const published = galleryItemsFromDocuments([
+    document("private", {
+      location: stringField("lovely"),
+      isPublic: { booleanValue: false },
+      imageUrl: stringField("https://media.base44.com/images/public/example/private.jpg"),
+      caption: stringField("Private set"),
+      sortOrder: { integerValue: "0" },
+    }),
+    document("casa-public", {
+      location: stringField("casabella"),
+      isPublic: { booleanValue: true },
+      imageUrl: stringField("https://firebasestorage.googleapis.com/v0/b/example/o/casa.jpg"),
+      caption: stringField("Casabella set"),
+      sortOrder: { integerValue: "1" },
+    }),
+    document("later", {
+      location: stringField("lovely"),
+      isPublic: { booleanValue: true },
+      imageUrl: stringField("https://firebasestorage.googleapis.com/v0/b/example/o/later.jpg?alt=media"),
+      caption: stringField("Sage tips"),
+      title: stringField("Ignored title"),
+      category: stringField("French tips"),
+      sortOrder: { integerValue: "5" },
+    }),
+    document("shared", {
+      location: stringField("all"),
+      isPublic: { booleanValue: true },
+      imageUrl: stringField("https://media.base44.com/images/public/example/shared.jpg"),
+      caption: stringField("Shared blush"),
+      category: stringField("Nail art"),
+      sortOrder: { integerValue: "2" },
+    }),
+  ]);
+  assert.deepEqual(published, [
+    { title: "Shared blush", image: "https://media.base44.com/images/public/example/shared.jpg", category: "Nail art" },
+    { title: "Sage tips", image: "https://firebasestorage.googleapis.com/v0/b/example/o/later.jpg?alt=media", category: "French tips" },
+  ]);
+  assert.match(source, /collectionId: "galleryImages"/);
+  assert.match(source, /fieldPath: "sortOrder"/);
+
   const menu = menuSectionsFromDocuments([
     document("casa-service", {
       salonname: stringField("Casabella Nails And Spa"),

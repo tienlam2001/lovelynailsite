@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { matchingServices, type MenuSection } from "./mobile-menu";
+import { GalleryImage } from "./GalleryImage";
 import { galleryCategory, useSalonGallery, type GalleryItem } from "./salon-gallery";
 import { PromotionalSlides } from "./AnnouncementPopup";
 import { PromotionSignup } from "./PromotionSignup";
@@ -134,14 +135,14 @@ export function MobileExperience({ sections, photos, bookingUrl, phone, address,
           <p className="lm-kicker">A LITTLE INSPIRATION</p><h2>The Lovely Gallery</h2>
           <p className="lm-intro">Real looks from our salon. Tap to see every detail.</p>
           <div className="lm-filters" role="group" aria-label="Photo categories">{photoCategories.map((item) => <button type="button" key={item} aria-pressed={photoCategory === item} onClick={() => setPhotoCategory(item)}>{item}</button>)}</div>
-          <div className="lm-gallery">{visibleImages.map((image, index) => <button className="lm-photo" type="button" key={`${image.image}-${index}`} onClick={() => setExpanded(image)} aria-label={`Expand ${image.title}`}><img src={image.image} alt={image.title} loading="lazy" width={400} height={500} /><span>{image.title}</span></button>)}</div>
+          <div className="lm-gallery">{visibleImages.map((image, index) => <button className="lm-photo" type="button" key={`${image.image}-${index}`} onClick={() => setExpanded(image)} aria-label={`Expand ${image.title}`}><GalleryImage src={image.image} alt={image.title} width={400} height={500} sizes="(max-width: 700px) 100vw, 50vw" /><span>{image.title}</span></button>)}</div>
           {!visibleImages.length && <p className="lm-empty">No photos in this category yet. Choose another category.</p>}
           <a className="lm-action lm-action-gold lm-gallery-book" href={bookingUrl}>Book your inspired look ↗</a>
         </div>
       </section>
       <dialog className="lm-lightbox" ref={lightbox} onCancel={() => setExpanded(null)} onClose={() => setExpanded(null)} aria-label={expanded ? expanded.title : "Full gallery photo"}>
         <button autoFocus type="button" className="lm-lightbox-close" onClick={() => setExpanded(null)} aria-label="Close full photo">×</button>
-        {expanded && <><img src={expanded.image} alt={expanded.title} /><p>{expanded.title}</p></>}
+        {expanded && <><GalleryImage src={expanded.image} alt={expanded.title} width={900} height={1200} sizes="100vw" /><p>{expanded.title}</p></>}
       </dialog>
     </div>
   );

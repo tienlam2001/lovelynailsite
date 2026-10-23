@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { galleryItemsFromDocuments, listCollection, type GalleryItem } from "./firebase-public";
+import { galleryItemsFromDocuments, listCollection, queryPublicGalleryImages, type GalleryItem } from "./firebase-public";
 
 export type { GalleryItem };
-
-const collections = ["gallery", "galleryImages"];
 
 export function galleryCategory(item: GalleryItem) {
   if (item.category) return item.category;
@@ -19,13 +17,19 @@ export function useSalonGallery(fallback: GalleryItem[]) {
   useEffect(() => {
     const controller = new AbortController();
     async function load() {
-      const results = await Promise.all(collections.map((collection) => listCollection(collection, controller.signal)));
+      const [queried, listed] = await Promise.all([
+        queryPublicGalleryImages(controller.signal),
+        listCollection("galleryImages", controller.signal),
+      ]);
       if (controller.signal.aborted) return;
-      if (results.every((result) => !result.ok)) {
+      if (!queried.ok && !listed.ok) {
         setImages(fallback);
         return;
       }
-      const photos = galleryItemsFromDocuments(results.flatMap((result) => result.ok ? result.documents : []));
+      const photos = galleryItemsFromDocuments([
+        ...(queried.ok ? queried.documents : []),
+        ...(listed.ok ? listed.documents : []),
+      ]);
       setImages(photos.length ? photos : fallback);
     }
     load().catch(() => { if (!controller.signal.aborted) setImages(fallback); });

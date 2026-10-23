@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { GalleryImage } from "./GalleryImage";
 import { useSalonGallery, type GalleryItem } from "./salon-gallery";
 
 export function Gallery({ fallback }: { fallback: GalleryItem[] }) {
@@ -27,7 +28,7 @@ export function Gallery({ fallback }: { fallback: GalleryItem[] }) {
     <div className="gallery-grid" ref={grid}>
       {images.map((item, index) => (
         <div className={`gallery-tile tile-${index + 1}`} key={`${item.image}-${index}`} data-reveal="zoom-soft">
-          <img src={item.image} alt={item.title} loading="lazy" />
+          <GalleryImage src={item.image} alt={item.title} width={800} height={1000} sizes="(max-width: 620px) 100vw, 33vw" />
           <span>{item.title}</span>
         </div>
       ))}

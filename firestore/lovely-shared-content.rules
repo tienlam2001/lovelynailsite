@@ -16,8 +16,12 @@
 //   optional enabled/active/isActive/status/startDate/endDate
 // - promotions/{id}: salonname, business, title, description, offer, imageUrl,
 //   isActive, startDate, endDate
-// - gallery/{id} and galleryImages/{id}: salonname, imageUrl, alt or title,
-//   category or tags, optional featured, sortOrder, active/hidden
+// - gallery/{id}: older Gallery Manager uploads. salonname, imageUrl, alt or title
+// - galleryImages/{id}: imageUrl, caption (or alt/title), category, location
+//   ("lovely" | "all"), isPublic, sortOrder. Older docs may use salonname and
+//   omit isPublic/location. Website query: isPublic == true, location in
+//   ["lovely","all"], orderBy sortOrder. Composite index: isPublic ASC,
+//   location ASC, sortOrder ASC.
 // - lovelyNailServices/{id} and services/{id}: salonname, name, category,
 //   priceFrom, sectionOrder, itemOrder, optional active
 // - lovelyNailPromotionList/{id}: validated public create only
@@ -47,8 +51,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Public queries must include isPublic == true. Documents written before
+    // that field existed stay readable so current salon photos are not hidden.
     match /galleryImages/{imageId} {
-      allow read: if true;
+      allow read: if resource.data.isPublic == true
+        || !resource.data.keys().hasAny(['isPublic']);
       allow write: if isAdmin();
     }
 

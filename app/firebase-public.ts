@@ -287,18 +287,39 @@ function httpsUrl(value: unknown): string {
   return url.protocol === "https:" ? url.href : "";
 }
 
+function galleryPlace(fields: Record<string, unknown>): "lovely" | "all" | "other" | "legacy" {
+  const location = text(fields.location).toLowerCase();
+  if (!location) return "legacy";
+  if (location === "all") return "all";
+  return locationKey(location) === "lovely" ? "lovely" : "other";
+}
+
 export function galleryItemsFromDocuments(documents: FirestoreDocument[]): GalleryItem[] {
   const photos: (GalleryItem & { featured: boolean; sortOrder: number; createdAt: string })[] = [];
   const seen = new Set<string>();
-  for (const record of publishedLovely(asRecord(documents), new Date(), { dates: false })) {
-    const image = httpsUrl(record.fields.imageUrl);
+  for (const record of asRecord(documents)) {
+    if (flag(record.fields.isPublic) === false) continue;
+    if (flag(record.fields.hidden) === true || flag(record.fields.active) === false) continue;
+    const place = galleryPlace(record.fields);
+    if (place === "other") continue;
+    if (place === "legacy") {
+      const legacy = isLovelyRecord({
+        salonname: text(record.fields.salonname || record.fields.salonName),
+        business: text(record.fields.business),
+        documentId: record.documentId,
+      }) && isActiveContent(record.fields, new Date(), { dates: false });
+      if (!legacy) continue;
+    } else if (flag(record.fields.isPublic) !== true) {
+      continue;
+    }
+    const image = httpsUrl(record.fields.imageUrl) || httpsUrl(record.fields.image_url);
     if (!image || seen.has(image)) continue;
     seen.add(image);
     const tags = Array.isArray(record.fields.tags) ? record.fields.tags.map((tag) => text(tag)).filter(Boolean) : [];
     const category = text(record.fields.category) || tags[0] || undefined;
     photos.push({
       image,
-      title: text(record.fields.alt) || text(record.fields.title) || "Lovely Nail & Spa nail design",
+      title: text(record.fields.caption) || text(record.fields.alt) || text(record.fields.title) || "Lovely Nail & Spa nail design",
       category,
       featured: flag(record.fields.featured) === true,
       sortOrder: Number.isFinite(Number(record.fields.sortOrder)) ? Number(record.fields.sortOrder) : Number.MAX_SAFE_INTEGER,
@@ -306,8 +327,8 @@ export function galleryItemsFromDocuments(documents: FirestoreDocument[]): Galle
     });
   }
   photos.sort((first, second) => {
-    if (first.featured !== second.featured) return first.featured ? -1 : 1;
     if (first.sortOrder !== second.sortOrder) return first.sortOrder - second.sortOrder;
+    if (first.featured !== second.featured) return first.featured ? -1 : 1;
     return second.createdAt.localeCompare(first.createdAt);
   });
   return photos.map(({ title, image, category }) => ({ title, image, category }));
@@ -726,6 +747,58 @@ export function resolveSalonHours(fields: Record<string, unknown> | null | undef
     }
   }
   return hoursFromWeekly(weekly, specials, timezone, "firestore", now);
+}
+
+export async function queryPublicGalleryImages(
+  signal?: AbortSignal,
+): Promise<{ ok: true; documents: FirestoreDocument[] } | { ok: false }> {
+  try {
+    const response = await fetch(
+      `https://firestore.googleapis.com/v1/${firebaseDatabasePath()}/documents:runQuery`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        signal,
+        body: JSON.stringify({
+          structuredQuery: {
+            from: [{ collectionId: "galleryImages" }],
+            where: {
+              compositeFilter: {
+                op: "AND",
+                filters: [
+                  {
+                    fieldFilter: {
+                      field: { fieldPath: "isPublic" },
+                      op: "EQUAL",
+                      value: { booleanValue: true },
+                    },
+                  },
+                  {
+                    fieldFilter: {
+                      field: { fieldPath: "location" },
+                      op: "IN",
+                      value: {
+                        arrayValue: {
+                          values: [{ stringValue: "lovely" }, { stringValue: "all" }],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            orderBy: [{ field: { fieldPath: "sortOrder" }, direction: "ASCENDING" }],
+          },
+        }),
+      },
+    );
+    if (!response.ok) return { ok: false };
+    const rows = await response.json() as { document?: FirestoreDocument }[];
+    return { ok: true, documents: rows.flatMap((row) => row.document ? [row.document] : []) };
+  } catch {
+    return { ok: false };
+  }
 }
 
 export async function listCollection(
