@@ -5,6 +5,7 @@ import { CustomerChat } from "./CustomerChat";
 import { ScrollReveal } from "./ScrollReveal";
 import { Gallery } from "./Gallery";
 import { getFirebaseMenu } from "./firebase-menu";
+import { getFirebaseHours } from "./firebase-hours";
 import { MobileExperience } from "./MobileExperience";
 
 export const dynamic = "force-dynamic";
@@ -434,10 +435,16 @@ const faqSchema: Record<string, unknown> = {
 };
 
 export default async function Home() {
-  const [liveMenu, welcomeOffer] = await Promise.all([
+  const [liveMenu, welcomeOffer, hours] = await Promise.all([
     getFirebaseMenu(menuSections),
     getFirebaseOffer(),
+    getFirebaseHours(),
   ]);
+  const weekdaysSameHours =
+    hours.monday === hours.tuesday &&
+    hours.monday === hours.wednesday &&
+    hours.monday === hours.thursday &&
+    hours.monday === hours.friday;
   const liveBusinessSchema = {
     ...localBusinessSchema,
     makesOffer: liveMenu.map((section) => ({
@@ -767,6 +774,23 @@ export default async function Home() {
             <a className="button button-secondary" href={bookingUrl}>
               Book Appointment
             </a>
+          </div>
+          <div className="contact-hours" aria-label="Business hours">
+            <p className="eyebrow">Hours</p>
+            {weekdaysSameHours ? (
+              <p>Mon–Fri: {hours.monday}</p>
+            ) : (
+              <>
+                <p>Mon: {hours.monday}</p>
+                <p>Tue: {hours.tuesday}</p>
+                <p>Wed: {hours.wednesday}</p>
+                <p>Thu: {hours.thursday}</p>
+                <p>Fri: {hours.friday}</p>
+              </>
+            )}
+            <p>Sat: {hours.saturday}</p>
+            <p>Sun: {hours.sunday}</p>
+            {hours.note ? <p>{hours.note}</p> : null}
           </div>
         </div>
         <div className="location-panel" data-reveal="float-in">
