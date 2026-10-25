@@ -1463,6 +1463,14 @@ h3 {
   margin-top: 1.5rem;
 }
 
+.contact-hours {
+  margin-top: 1.5rem;
+}
+
+.contact-hours p {
+  margin: 0.15rem 0;
+}
+
 .location-panel {
   display: grid;
   gap: 1rem;
