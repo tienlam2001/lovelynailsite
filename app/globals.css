@@ -1463,14 +1463,6 @@ h3 {
   margin-top: 1.5rem;
 }
 
-.contact-hours {
-  margin-top: 1.5rem;
-}
-
-.contact-hours p {
-  margin: 0.15rem 0;
-}
-
 .location-panel {
   display: grid;
   gap: 1rem;
@@ -1918,3 +1910,11 @@ h3 {
     transition: none;
   }
 }
+
+/* Crawlable service guides retain the salon's existing palette. */
+.service-page {max-width: 1050px; margin: auto; padding: 32px 24px 70px; height: 100dvh; overflow-y: auto;}
+.service-page h1 {font-family: Georgia, serif; font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.15;}
+.service-page section {margin: 32px 0;} .service-page p {line-height: 1.7;}
+.service-page nav, .service-links {display:flex; flex-wrap:wrap; gap:18px; margin:20px 0;}
+.service-page .menu-card {margin:20px 0;} .service-page footer {padding-top:24px; border-top:1px solid #d9c9c2;}
+.lm-local-info {margin-top:28px; font-size:.9rem; line-height:1.6;}.lm-local-info h2 {font-family:Georgia,serif;font-size:1.4rem;}.lm-local-info nav {display:flex;flex-wrap:wrap;gap:10px 18px;}.lm-local-info a {text-decoration:underline;}.lm-local-info dl div {display:flex;justify-content:space-between;gap:12px;}.lm-local-info dt {text-transform:capitalize;}.lm-local-info dd {margin:0;}
