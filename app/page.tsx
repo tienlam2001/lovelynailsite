@@ -6,6 +6,8 @@ import { ScrollReveal } from "./ScrollReveal";
 import { Gallery } from "./Gallery";
 import { getFirebaseMenu } from "./firebase-menu";
 import { getFirebaseHours } from "./firebase-hours";
+import { menuSections, servicePages } from "./service-data";
+import { hoursSchema } from "./hours-schema";
 import { MobileExperience } from "./MobileExperience";
 
 export const dynamic = "force-dynamic";
@@ -18,15 +20,6 @@ const directionsUrl =
   "https://www.google.com/maps/dir/?api=1&destination=3317%20Daniels%20Rd%20%23106%2C%20Winter%20Garden%2C%20FL%2034787";
 const mapUrl =
   "https://www.google.com/maps?q=3317%20Daniels%20Rd%20%23106%2C%20Winter%20Garden%2C%20FL%2034787&output=embed";
-
-type MenuItem = [service: string, price: string, description?: string];
-
-type MenuSection = {
-  title: string;
-  note: string;
-  featured?: boolean;
-  items: MenuItem[];
-};
 
 type Review = {
   name: string;
@@ -46,7 +39,7 @@ const navigation = [
   { label: "Gallery", href: "#gallery" },
   { label: "Reviews", href: "#reviews" },
   { label: "Promotions", href: "#promotions" },
-  { label: "Blog", href: "#blog" },
+  { label: "Service Guides", href: "#service-guides" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -123,12 +116,6 @@ const galleryItems = [
   },
 ];
 
-const posts = [
-  "How often should you book a manicure?",
-  "Gel polish care between visits",
-  "Simple pedicure habits for Florida weather",
-];
-
 const reviewHighlights = [
   "Comfortable chairs",
   "Dip nails",
@@ -138,155 +125,6 @@ const reviewHighlights = [
   "Clean salon",
 ];
 
-const menuSections: MenuSection[] = [
-  {
-    title: "Pedicures",
-    note: "Relaxing foot care with soaking, grooming, exfoliation, massage, and hot towels.",
-    featured: true,
-    items: [
-      [
-        "Classic Pedicure",
-        "$33",
-        "Spa soak, nail shaping & cuticle care, light scrub, lotion, relaxing massage, hot towel.",
-      ],
-      [
-        "Premium Pedicure",
-        "$40",
-        "Classic pedicure care, sugar scrub, callus removal, lotion, extended massage, hot towel.",
-      ],
-      [
-        "Deluxe Pedicure",
-        "$47",
-        "Premium pedicure care, hydrating mask, 2 hot towels, longer massage.",
-      ],
-      [
-        "Collagen Pedicure",
-        "$55",
-        "Deluxe pedicure care, collagen treatment, paraffin treatment, 3 hot towels, extended spa massage, choice of scent: Jasmine or Pearl.",
-      ],
-      [
-        "Hurricane Spa Pedicure",
-        "$65",
-        "Full spa treatment, sugar scrub, callus removal, hydrating mask, paraffin treatment, hot stone massage, longer spa massage, hot towel treatment, choice of scent: Jasmine, Gold, or Pearl.",
-      ],
-      [
-        "Golden Pedicure",
-        "$85",
-        "Premium golden spa treatment, sugar scrub, callus removal, hydrating mask, paraffin treatment, hot stone massage, steamer treatment, longest luxury massage, hot towel treatment.",
-      ],
-    ],
-  },
-  {
-    title: "Acrylic",
-    note: "Regular polish or gel polish acrylic sets and fills.",
-    featured: true,
-    items: [
-      ["Full Set — Regular Polish", "$45"],
-      ["Fill-In — Regular Polish", "$40"],
-      ["Full Set — Gel Polish", "$55"],
-      ["Fill-In — Gel Polish", "$50"],
-      ["Coffin / Almond / Stiletto / Specialty Shape", "+$7"],
-      ["Extra Length", "+$5"],
-      ["Acrylic Toe", "$8"],
-      ["2 Acrylic Toes", "$15"],
-    ],
-  },
-  {
-    title: "Liquid Gel — Non-Acrylic",
-    note: "Non-acrylic gel enhancements and repairs.",
-    items: [
-      ["Full Set", "$60"],
-      ["Fill-In", "$55"],
-      ["Nail Repair", "$5"],
-      ["Extra Length", "+$5"],
-    ],
-  },
-  {
-    title: "Gel-X",
-    note: "Lightweight full-cover gel extensions.",
-    items: [
-      ["Full Set", "$60+"],
-      ["Extra Length", "+$5"],
-    ],
-  },
-  {
-    title: "Dipping Powder",
-    note: "Powder color sets, pink & white, and shaped finishes.",
-    items: [
-      ["Full Set Color", "$45"],
-      ["Full Set Pink & White", "$52"],
-      ["Coffin / Almond / Stiletto / Specialty Shape", "+$7"],
-      ["Extra Length", "+$5"],
-    ],
-  },
-  {
-    title: "Manicure",
-    note: "Classic grooming, shaping, massage, and polish options.",
-    items: [
-      ["Regular Manicure", "$25"],
-      ["Gel Color Polish", "$25"],
-      ["Gel Removal", "+$5"],
-      ["Gel Color & Manicure", "$35"],
-    ],
-  },
-  {
-    title: "Polish Change",
-    note: "Quick polish refreshes for hands or feet.",
-    items: [
-      ["Feet — Regular Polish", "$15"],
-      ["Feet — Gel Polish", "$25"],
-      ["Feet — Gel Removal + New Gel Polish", "$30"],
-      ["Hands — Regular Polish", "$15"],
-      ["Hands — Gel Polish", "$20"],
-      ["Hands — Gel Removal + New Gel Polish", "$25"],
-      ["French Add-On", "+$5"],
-    ],
-  },
-  {
-    title: "Little Ones",
-    note: "For children 10 years old or younger.",
-    items: [
-      ["Manicure", "$17"],
-      ["Pedicure", "$27"],
-      ["Polish Change — Hands", "$12"],
-      ["Polish Change — Feet", "$15"],
-      ["Gel Manicure", "$27"],
-      ["Gel Pedicure", "$37"],
-      ["Gel Polish — Hands", "$15"],
-      ["Gel Polish — Feet", "$18"],
-    ],
-  },
-  {
-    title: "Removal & Repair",
-    note: "Safe removal and simple nail repair services.",
-    items: [
-      ["Acrylic Soak-Off Only", "$15"],
-      ["Acrylic or Gel Removal with New Service", "+$10"],
-      ["Nail Repair", "$5+"],
-    ],
-  },
-  {
-    title: "Nail Design",
-    note: "Custom nail art and design pricing varies by request.",
-    items: [["Custom Nail Design", "Price Varies", "Please ask your nail technician for pricing."]],
-  },
-  {
-    title: "Waxing",
-    note: "Hair removal with soothing honey wax.",
-    items: [
-      ["Eyebrows", "$12"],
-      ["Lips", "$10"],
-      ["Chin", "$10+"],
-      ["Full Face", "$35"],
-      ["Underarms", "$20+"],
-      ["Full Arms", "$35"],
-      ["Half Arms", "$25"],
-      ["Full Legs", "$50+"],
-      ["Half Legs", "$30"],
-      ["Back", "$50+"],
-    ],
-  },
-];
 
 const reviews: Review[] = [
   {
@@ -390,11 +228,6 @@ const localBusinessSchema: Record<string, unknown> = {
     "@type": "Place",
     name: area,
   })),
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.0",
-    reviewCount: "453",
-  },
   hasMap: directionsUrl,
   potentialAction: {
     "@type": "ReserveAction",
@@ -447,6 +280,7 @@ export default async function Home() {
     hours.monday === hours.friday;
   const liveBusinessSchema = {
     ...localBusinessSchema,
+    openingHoursSpecification: hoursSchema(hours),
     makesOffer: liveMenu.map((section) => ({
       "@type": "Offer",
       itemOffered: {
@@ -468,7 +302,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
-      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} offer={welcomeOffer} />
+      <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} hours={hours} offer={welcomeOffer} />
       <CustomerChat />
       <ScrollReveal />
       <div className="desktop-experience">
@@ -701,7 +535,7 @@ export default async function Home() {
               </div>
               <p className="review-details">{review.details}</p>
               <div className="review-meta">
-                <span>{review.date}</span>
+
                 {review.price && <span>{review.price}</span>}
               </div>
               <blockquote>{review.text}</blockquote>
@@ -743,20 +577,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="blog" className="section-pad split-section">
-        <div data-reveal="fade-up">
-          <p className="eyebrow">Blog</p>
-          <h2>Helpful care notes for clients.</h2>
-        </div>
-        <div className="blog-list">
-          {posts.map((post) => (
-            <article key={post} data-reveal="fade-up">
-              <h3>{post}</h3>
-              <p>Short, practical advice can be added here when the blog is ready.</p>
-              <a href={bookingUrl}>Book after reading</a>
-            </article>
-          ))}
-        </div>
+      <section id="service-guides" className="section-pad split-section">
+        <div><p className="eyebrow">Plan your visit</p><h2>Nail services in Winter Garden</h2><p>Explore your options, current prices, and what to ask before booking.</p></div>
+        <div className="blog-list">{servicePages.map((service) => <article key={service.slug}><h3><a href={`/services/${service.slug}`}>{service.title} in Winter Garden</a></h3><p>{service.intro}</p><a href={`/services/${service.slug}`}>Explore {service.title.toLowerCase()}</a></article>)}</div>
       </section>
 
       <section id="contact" className="section-pad contact-section">
