@@ -7,10 +7,13 @@ import { PromotionalSlides } from "./AnnouncementPopup";
 import { PromotionSignup } from "./PromotionSignup";
 import type { WelcomeOffer } from "./firebase-offer";
 
-type Panel = "home" | "menu" | "gallery";
-type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offer: WelcomeOffer | null };
+import type { SalonHours } from "./firebase-hours";
+import { servicePages } from "./service-data";
 
-export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offer }: Props) {
+type Panel = "home" | "menu" | "gallery";
+type Props = { sections: MenuSection[]; photos: GalleryItem[]; bookingUrl: string; phone: string; address: string; directionsUrl: string; offer: WelcomeOffer | null; hours: SalonHours };
+
+export function MobileExperience({ sections, photos, bookingUrl, phone, address, directionsUrl, offer, hours }: Props) {
   const [panel, setPanel] = useState<Panel>("home");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -94,6 +97,9 @@ export function MobileExperience({ sections, photos, bookingUrl, phone, address,
             <a className="lm-action" href={directionsUrl} target="_blank" rel="noreferrer"><span aria-hidden="true">⌁</span>Get Directions</a>
           </nav>
           <p className="lm-address">{address}</p>
+          <section className="lm-local-info"><h2>Your nail salon in Winter Garden</h2><p>Pedicures, manicures, acrylic nails, Gel-X, dipping powder, nail art, and waxing on Daniels Road near Winter Garden Village.</p>
+          <nav aria-label="Explore nail services">{servicePages.map(s => <a key={s.slug} href={`/services/${s.slug}`}>{s.title}</a>)}</nav>
+          <h2>Business hours</h2><dl>{Object.entries(hours).filter(([day]) => day !== "note").map(([day,value]) => <div key={day}><dt>{day}</dt><dd>{value}</dd></div>)}</dl>{hours.note && <p>{hours.note}</p>}</section>
         </div>
         {offer && <section className="lm-promotions" aria-label="Current salon promotions"><PromotionalSlides bookingUrl={bookingUrl} offer={offer} /></section>}
         <div className="lm-signup"><PromotionSignup idPrefix="mobile-promotion" /></div>
