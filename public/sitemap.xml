@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nailslovely.com/</loc>
-    <lastmod>2026-08-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+<url><loc>https://nailslovely.com/</loc><lastmod>2026-11-15</lastmod></url>
+<url><loc>https://nailslovely.com/services/pedicures</loc><lastmod>2026-11-15</lastmod></url>
+<url><loc>https://nailslovely.com/services/gel-x</loc><lastmod>2026-11-15</lastmod></url>
+<url><loc>https://nailslovely.com/services/acrylic-nails</loc><lastmod>2026-11-15</lastmod></url>
+<url><loc>https://nailslovely.com/services/manicures</loc><lastmod>2026-11-15</lastmod></url>
 </urlset>
