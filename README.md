@@ -175,3 +175,15 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+## Organic search service guides
+
+Four server-rendered service guides live under `/services/`: pedicures, gel-x,
+acrylic-nails, and manicures. They use the same Firebase menu as the homepage,
+with the shared fallback in `app/service-data.ts`. Each has its own canonical,
+title and description. Both mobile and desktop homepages link to the guides.
+Business hours come from the existing Firebase hours document and are shown on
+both layouts; parseable hours also populate local business structured data.
+Update sitemap lastmod only after substantive page changes. Search Console URL
+Inspection and sitemap submission must be done separately in the owner's account;
+publication alone does not guarantee indexing or a ranking position.
