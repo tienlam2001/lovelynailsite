@@ -301,7 +301,8 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} />
+      {/* Promo popup hidden for now — uncomment to re-enable */}
+      {/* <AnnouncementPopup bookingUrl={bookingUrl} offer={welcomeOffer} /> */}
       <MobileExperience sections={liveMenu} photos={galleryItems} bookingUrl={bookingUrl} phone={phone} address={address} directionsUrl={directionsUrl} hours={hours} offer={welcomeOffer} />
       <CustomerChat />
       <ScrollReveal />
