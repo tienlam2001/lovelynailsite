@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOVELY Nails &amp; Spa — Menu</title>
+<meta name="description" content="Full service menu and pricing for LOVELY Nails &amp; Spa.">
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --muted: #6b6b6b;
+    --line: #e4e0da;
+    --bg: #fdfcfa;
+    --accent: #9c7a4e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 60px; }
+  header { text-align: center; margin-bottom: 28px; }
+  .brand { font-size: 2.6rem; letter-spacing: 0.18em; margin: 0; font-weight: 400; }
+  .tagline { letter-spacing: 0.3em; font-size: 0.7rem; color: var(--muted); margin-top: 6px; text-transform: uppercase; }
+  .divider { border: none; border-top: 1px solid var(--line); margin: 22px 0; }
+  nav.tabs { display: flex; justify-content: center; gap: 10px; margin: 18px 0 30px; flex-wrap: wrap; }
+  nav.tabs button {
+    font-family: inherit; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    background: transparent; border: 1px solid var(--line); color: var(--ink);
+    padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  }
+  nav.tabs button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  section.panel { display: none; }
+  section.panel.active { display: block; }
+  .section-title { text-align: center; letter-spacing: 0.25em; font-size: 0.95rem; text-transform: uppercase; margin: 30px 0 18px; }
+  .cols { display: grid; grid-template-columns: 1fr; gap: 28px; }
+  @media (min-width: 640px) { .cols { grid-template-columns: 1fr 1fr; } }
+  .cols.three { grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .cols.three { grid-template-columns: 1fr 1fr 1fr; } }
+  h3.group { font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 10px; }
+  ul.items { list-style: none; margin: 0 0 18px; padding: 0; }
+  ul.items li { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 0.95rem; }
+  ul.items li .nm { color: var(--ink); }
+  ul.items li .pr { color: var(--muted); white-space: nowrap; }
+  .note { font-size: 0.82rem; color: var(--muted); font-style: italic; margin: 6px 0 16px; }
+  .combo-wrap { overflow-x: auto; margin: 16px 0 28px; }
+  table.combo { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 420px; }
+  table.combo th, table.combo td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  table.combo th { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--muted); }
+  table.combo td.price { text-align: right; }
+  .pedi-card { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+  .pedi-card .hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .pedi-card .hd .nm { font-size: 1.05rem; letter-spacing: 0.04em; }
+  .pedi-card .hd .pr { font-size: 1.05rem; color: var(--accent); }
+  .pedi-card p { margin: 0; color: #444; font-size: 0.92rem; line-height: 1.5; }
+  footer { text-align: center; margin-top: 40px; color: var(--muted); font-size: 0.82rem; }
+  footer .fine { margin-top: 4px; font-size: 0.75rem; }
+  a { color: inherit; }
+  .call-btn { display: inline-block; margin-top: 16px; padding: 10px 22px; border: 1px solid var(--ink); border-radius: 999px; text-decoration: none; letter-spacing: 0.08em; font-size: 0.8rem; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="brand">LOVELY</p>
+    <p class="tagline">Nails &amp; Spa</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="active" data-panel="services">All Services</button>
+    <button data-panel="pedicures">Pedicure Spa Menu</button>
+  </nav>
+
+  <section class="panel active" id="services">
+    <div class="cols three">
+<div>
+<h3 class="group">Manicure</h3>
+<ul class="items">
+<li><span class="nm">Classic Manicure</span><span class="pr">$25</span></li>
+<li><span class="nm">Gel Color & Mani</span><span class="pr">$35</span></li>
+<li><span class="nm">Gel Mani w/ French</span><span class="pr">$42</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Acrylic</h3>
+<ul class="items">
+<li><span class="nm">Full Set w/ Gel</span><span class="pr">$55</span></li>
+<li><span class="nm">Full Set w/ Regular</span><span class="pr">$45</span></li>
+<li><span class="nm">Fill w/ Gel</span><span class="pr">$50</span></li>
+<li><span class="nm">Fill w/ Regular</span><span class="pr">$40</span></li>
+<li><span class="nm">Medium Length (add)</span><span class="pr">$5</span></li>
+<li><span class="nm">Long Length (add)</span><span class="pr">$10</span></li>
+<li><span class="nm">Extra Length (add)</span><span class="pr">$15</span></li>
+<li><span class="nm">Shape (add)</span><span class="pr">$7</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Builder Gel</h3>
+<ul class="items">
+<li><span class="nm">Full Set</span><span class="pr">$60</span></li>
+<li><span class="nm">Fill In</span><span class="pr">$55</span></li>
+<li><span class="nm">Nail Repair</span><span class="pr">$5</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Gel-X</h3>
+<ul class="items">
+<li><span class="nm">Full Set</span><span class="pr">$60</span></li>
+<li><span class="nm">Fill In</span><span class="pr">$55</span></li>
+<li><span class="nm">Length (add)</span><span class="pr">$5</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Pedicure</h3>
+<ul class="items">
+<li><span class="nm">Classic</span><span class="pr">$33</span></li>
+<li><span class="nm">Premium</span><span class="pr">$40</span></li>
+<li><span class="nm">Deluxe</span><span class="pr">$47</span></li>
+<li><span class="nm">Collagen</span><span class="pr">$55</span></li>
+<li><span class="nm">Hurricane</span><span class="pr">$65</span></li>
+<li><span class="nm">Golden</span><span class="pr">$85</span></li>
+</ul>
+<p class="note">Regular toe polish included. Gel toes +$20.</p>
+</div>
+<div>
+<h3 class="group">Dipping Powder</h3>
+<ul class="items">
+<li><span class="nm">Full Set Color</span><span class="pr">$45</span></li>
+<li><span class="nm">Full Set Pink & White</span><span class="pr">$50</span></li>
+<li><span class="nm">Dip Ombre Pink & White</span><span class="pr">$65</span></li>
+<li><span class="nm">Shape (add)</span><span class="pr">$7</span></li>
+</ul>
+<p class="note">Gel prices exclude removal. Existing gel removal +$5.</p>
+</div>
+<div>
+<h3 class="group">Additional Services</h3>
+<ul class="items">
+<li><span class="nm">French Tip</span><span class="pr">$7</span></li>
+<li><span class="nm">American Mani</span><span class="pr">$7</span></li>
+<li><span class="nm">High Gloss Gel Sealer</span><span class="pr">$5</span></li>
+<li><span class="nm">Nail Art Designs</span><span class="pr">$5</span></li>
+<li><span class="nm">Soak Off (Acrylic/Gel)</span><span class="pr">$15</span></li>
+<li><span class="nm">Soak Off w/ New Set</span><span class="pr">$5</span></li>
+<li><span class="nm">Chrome</span><span class="pr">$15</span></li>
+<li><span class="nm">Cat Eye</span><span class="pr">$15</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Kids</h3>
+<ul class="items">
+<li><span class="nm">Mani</span><span class="pr">$17</span></li>
+<li><span class="nm">Pedi</span><span class="pr">$27</span></li>
+<li><span class="nm">Gel Manicure</span><span class="pr">$27</span></li>
+<li><span class="nm">Gel Pedicure</span><span class="pr">$37</span></li>
+<li><span class="nm">Regular Polish – Hands</span><span class="pr">$12</span></li>
+<li><span class="nm">Regular Polish – Feet</span><span class="pr">$15</span></li>
+<li><span class="nm">Gel Polish – Hands</span><span class="pr">$15</span></li>
+<li><span class="nm">Gel Polish – Feet</span><span class="pr">$18</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Waxing</h3>
+<ul class="items">
+<li><span class="nm">Eyebrows</span><span class="pr">$12</span></li>
+<li><span class="nm">Full Arms</span><span class="pr">$35</span></li>
+<li><span class="nm">Lip</span><span class="pr">$10</span></li>
+<li><span class="nm">Chin</span><span class="pr">$10</span></li>
+<li><span class="nm">Full Face</span><span class="pr">$35</span></li>
+<li><span class="nm">Under Arm</span><span class="pr">$20</span></li>
+<li><span class="nm">Half Arm</span><span class="pr">$25</span></li>
+<li><span class="nm">Back</span><span class="pr">$45</span></li>
+<li><span class="nm">Full Legs</span><span class="pr">$50</span></li>
+<li><span class="nm">Half Leg</span><span class="pr">$30</span></li>
+</ul>
+</div>
+<div>
+<h3 class="group">Polish Changes</h3>
+<ul class="items">
+<li><span class="nm">Regular Polish Change – Hands</span><span class="pr">$15</span></li>
+<li><span class="nm">Regular French Polish Change – Hands</span><span class="pr">$20</span></li>
+<li><span class="nm">Regular Polish Change – Feet</span><span class="pr">$20</span></li>
+<li><span class="nm">Gel Polish Change – Hands</span><span class="pr">$20</span></li>
+<li><span class="nm">Gel Polish Change – Feet</span><span class="pr">$25</span></li>
+</ul>
+</div>
+</div>
+<h3 class="group" style="margin-top:10px;">Mani + Pedi Combos</h3>
+<p class="note">Save $5 on your manicure with any adult pedicure. Combos include regular toe polish. Gel polish on toes +$20.</p>
+<div class="combo-wrap"><table class="combo"><thead><tr><th>Pedicure</th><th>With Regular Manicure</th><th>With Gel Manicure</th></tr></thead><tbody>
+<tr><td>Classic</td><td class="price">$53</td><td class="price">$63</td></tr>
+<tr><td>Premium</td><td class="price">$60</td><td class="price">$70</td></tr>
+<tr><td>Deluxe</td><td class="price">$67</td><td class="price">$77</td></tr>
+<tr><td>Collagen</td><td class="price">$75</td><td class="price">$85</td></tr>
+<tr><td>Hurricane Spa</td><td class="price">$85</td><td class="price">$95</td></tr>
+<tr><td>Golden</td><td class="price">$105</td><td class="price">$115</td></tr>
+</tbody></table></div>
+
+  </section>
+
+  <section class="panel" id="pedicures">
+    <p class="section-title" style="margin-top:0;">Pedicure Spa Menu</p>
+<div class="pedi-card"><div class="hd"><span class="nm">Classic</span><span class="pr">$33</span></div><p>Warm foot soak; nail trimming and shaping; cuticle care; light exfoliating scrub; lotion massage; hot towel; regular polish.</p></div>
+<div class="pedi-card"><div class="hd"><span class="nm">Premium</span><span class="pr">$40</span></div><p>Classic Pedicure care; sugar scrub; callus removal; moisturizing lotion massage; hot towel; regular polish.</p></div>
+<div class="pedi-card"><div class="hd"><span class="nm">Deluxe</span><span class="pr">$47</span></div><p>Nail and cuticle care; sugar scrub; callus removal; hydrating foot mask; moisturizing lotion massage; two hot towels; regular polish.</p></div>
+<div class="pedi-card"><div class="hd"><span class="nm">Collagen</span><span class="pr">$55</span></div><p>Nail and cuticle care; exfoliating scrub; callus removal; collagen moisturizing treatment; paraffin wax; lotion massage; three hot towels; regular polish.</p></div>
+<div class="pedi-card"><div class="hd"><span class="nm">Hurricane Spa</span><span class="pr">$65</span></div><p>Specialty spa treatment; exfoliating scrub; callus removal; moisturizing mask; paraffin wax; hot stone massage; three hot towels; regular polish.</p></div>
+<div class="pedi-card"><div class="hd"><span class="nm">Golden</span><span class="pr">$85</span></div><p>Golden spa soak; premium exfoliating scrub; callus removal; Golden moisturizing mask; paraffin wax; steamer treatment; hot stone massage; three hot towels; regular polish.</p></div>
+<div class="cols ">
+<div>
+<h3 class="group">Kids Pedicure & Manicure</h3>
+<ul class="items">
+<li><span class="nm">Regular Manicure</span><span class="pr">$17</span></li>
+<li><span class="nm">Regular Pedicure</span><span class="pr">$27</span></li>
+<li><span class="nm">Gel Manicure</span><span class="pr">$27</span></li>
+<li><span class="nm">Gel Pedicure</span><span class="pr">$37</span></li>
+</ul>
+<p class="note">Complete your visit · Save $5 — Add a regular manicure for $20 or a gel manicure for $30 with any adult pedicure.</p>
+</div>
+</div>
+<h3 class="group" style="margin-top:10px;">Mani + Pedi Combos</h3>
+<p class="note">Save $5 on your manicure with any adult pedicure. Combos include regular toe polish. Gel polish on toes +$20.</p>
+<div class="combo-wrap"><table class="combo"><thead><tr><th>Pedicure</th><th>With Regular Manicure</th><th>With Gel Manicure</th></tr></thead><tbody>
+<tr><td>Classic</td><td class="price">$53</td><td class="price">$63</td></tr>
+<tr><td>Premium</td><td class="price">$60</td><td class="price">$70</td></tr>
+<tr><td>Deluxe</td><td class="price">$67</td><td class="price">$77</td></tr>
+<tr><td>Collagen</td><td class="price">$75</td><td class="price">$85</td></tr>
+<tr><td>Hurricane Spa</td><td class="price">$85</td><td class="price">$95</td></tr>
+<tr><td>Golden</td><td class="price">$105</td><td class="price">$115</td></tr>
+</tbody></table></div>
+
+  </section>
+
+  <footer>
+    <div>3317 Daniels Rd #106, Winter Garden, FL 34787 &middot; (407) 654-0254 &middot; nailslovely.com</div>
+    <div class="fine">Starting prices. Prices may vary by length, shape and design.</div>
+    <a class="call-btn" href="tel:+14076540254">Call (407) 654-0254</a>
+  </footer>
+</div>
+<script>
+  document.querySelectorAll('nav.tabs button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('nav.tabs button').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('section.panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.panel).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
